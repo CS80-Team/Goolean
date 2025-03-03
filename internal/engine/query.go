@@ -32,7 +32,7 @@ func (e *Engine) inverse(s internal.SortedStructure) internal.SortedStructure {
 		return res
 	}
 
-	for i := 0; i < e.nextDocID; i++ {
+	for i := 0; i < e.GetDocumentsSize(); i++ {
 		if _, found := s.BinarySearch(i); !found {
 			res.InsertSorted(i)
 		}

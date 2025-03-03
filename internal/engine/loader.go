@@ -18,8 +18,7 @@ func (e *Engine) LoadDirectory(path string) {
 		if _, ok := e.library[doc.Name]; !ok {
 			e.docs = append(e.docs, doc)
 			e.library[doc.Path] = struct{}{}
-			doc.ID = e.nextDocID
-			e.nextDocID++
+			doc.ID = e.GetNextDocID()
 			e.parseDocument(doc)
 		}
 	}

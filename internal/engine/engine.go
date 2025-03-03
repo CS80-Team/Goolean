@@ -5,18 +5,16 @@ import (
 )
 
 type Engine struct {
-	nextDocID int
-	docs      []*internal.Document
-	index     map[string]internal.SortedStructure
-	library   map[string]struct{}
+	docs    []*internal.Document
+	index   map[string]internal.SortedStructure
+	library map[string]struct{}
 }
 
 func NewEngine() *Engine {
 	return &Engine{
-		nextDocID: 0,
-		docs:      make([]*internal.Document, 0),
-		index:     make(map[string]internal.SortedStructure),
-		library:   make(map[string]struct{}),
+		docs:    make([]*internal.Document, 0),
+		index:   make(map[string]internal.SortedStructure),
+		library: make(map[string]struct{}),
 	}
 }
 
@@ -25,12 +23,17 @@ func (e *Engine) GetDocuments() []*internal.Document {
 }
 
 func (e *Engine) GetDocumentByID(id int) *internal.Document {
-	if id >= 0 && id < len(e.docs) {
-		return e.docs[id]
+	if id < 0 && id >= len(e.docs) {
+		panic("[Engine]: Document ID out of range")
 	}
-	return nil
+
+	return e.docs[id]
 }
 
 func (e *Engine) GetDocumentsSize() int {
-	return e.nextDocID
+	return len(e.docs)
+}
+
+func (e *Engine) GetNextDocID() int {
+	return e.GetDocumentsSize()
 }
