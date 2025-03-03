@@ -12,4 +12,10 @@ func main() {
 	// }
 
 	engine.ReadDir("dataset")
+
+	engine.Query("omar", "ahmed", "AND")
+	engine.Query("omar", "ahmed", "OR")
+	engine.Query("omar", "ahmed", "NOT")
+	engine.Query("ahmed", "ahmed", "NOT")
+	engine.Query("SYSCALL", "ahmed", "NOT")
 }

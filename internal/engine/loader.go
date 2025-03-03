@@ -18,8 +18,7 @@ func Load(path string) []*internal.Document {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-			fmt.Fprint(os.Stderr, "[Loader]: File does not exist\n")
-			os.Exit(1)
+			panic(fmt.Sprintf("[Loader]: Path %s does not exist", path))
 		}
 
 		if isLegiable(filepath.Ext(path)) {
