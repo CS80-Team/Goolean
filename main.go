@@ -2,23 +2,19 @@ package main
 
 import (
 	"Boolean-IR-System/internal/engine"
+	"fmt"
+	"os"
 )
 
 func main() {
-	// rs := retrieval.LoadDocs("dataset")
+	// args := os.Args
 
-	// for _, doc := range rs {
-	// 	fmt.Println(doc.Path, doc.Name)
+	// if len(args) < 2 {
+	// 	panic("Usage: ./Boolean-IR-System <path>")
 	// }
 
-	myEngine := engine.NewEngine()
-
-	// wip for cross-platform paths
-	myEngine.LoadDirectory("C:\\Users\\jett\\Boolean-IR-System\\dataset")
-
-	myEngine.Query("omar", "ahmed", "AND")
-	myEngine.Query("omar", "ahmed", "OR")
-	myEngine.Query("omar", "ahmed", "NOT")
-	myEngine.Query("ahmed", "ahmed", "NOT")
-	myEngine.Query("SYSCALL", "ahmed", "NOT")
+	e := engine.NewEngine()
+	e.LoadDirectory(os.Getenv("DATASET_PATH"))
+	fmt.Println(os.Getenv("DATASET_PATH"))
+	e.Query("omar", "ahmed", "AND")
 }
