@@ -5,17 +5,20 @@ import (
 )
 
 func main() {
-	// rs := retrieval.Load("dataset")
+	// rs := retrieval.LoadDocs("dataset")
 
 	// for _, doc := range rs {
 	// 	fmt.Println(doc.Path, doc.Name)
 	// }
 
-	engine.ReadDir("dataset")
+	myEngine := engine.NewEngine()
 
-	engine.Query("omar", "ahmed", "AND")
-	engine.Query("omar", "ahmed", "OR")
-	engine.Query("omar", "ahmed", "NOT")
-	engine.Query("ahmed", "ahmed", "NOT")
-	engine.Query("SYSCALL", "ahmed", "NOT")
+	// wip for cross-platform paths
+	myEngine.LoadDirectory("C:\\Users\\jett\\Boolean-IR-System\\dataset")
+
+	myEngine.Query("omar", "ahmed", "AND")
+	myEngine.Query("omar", "ahmed", "OR")
+	myEngine.Query("omar", "ahmed", "NOT")
+	myEngine.Query("ahmed", "ahmed", "NOT")
+	myEngine.Query("SYSCALL", "ahmed", "NOT")
 }

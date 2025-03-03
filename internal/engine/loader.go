@@ -8,11 +8,24 @@ import (
 	"path/filepath"
 )
 
-func isLegiable(ext string) bool {
+func isLegible(ext string) bool {
 	return ext == ".txt"
 }
 
-func Load(path string) []*internal.Document {
+func (e *Engine) LoadDirectory(path string) {
+	var newDocs = LoadDocs(path)
+	for _, doc := range newDocs {
+		if _, ok := e.library[doc.Name]; !ok {
+			e.docs = append(e.docs, doc)
+			e.library[doc.Path] = struct{}{}
+			doc.ID = e.nextDocID
+			e.nextDocID++
+			e.parseDocument(doc)
+		}
+	}
+}
+
+func LoadDocs(path string) []*internal.Document {
 	var docs []*internal.Document
 
 	files, err := os.ReadDir(path)
@@ -21,7 +34,7 @@ func Load(path string) []*internal.Document {
 			panic(fmt.Sprintf("[Loader]: Path %s does not exist", path))
 		}
 
-		if isLegiable(filepath.Ext(path)) {
+		if isLegible(filepath.Ext(path)) {
 			return []*internal.Document{{Path: path, Name: filepath.Base(path)}}
 		}
 		return nil
@@ -29,8 +42,8 @@ func Load(path string) []*internal.Document {
 
 	for _, file := range files {
 		if file.Type().IsDir() {
-			docs = append(docs, Load(filepath.Join(path, file.Name()))...)
-		} else if isLegiable(filepath.Ext(file.Name())) {
+			docs = append(docs, LoadDocs(filepath.Join(path, file.Name()))...)
+		} else if isLegible(filepath.Ext(file.Name())) {
 			docs = append(docs, &internal.Document{Path: path, Name: file.Name()})
 		}
 	}
