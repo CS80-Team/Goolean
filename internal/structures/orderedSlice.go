@@ -8,7 +8,10 @@ type OrderedSlice[T constraints.Ordered] struct {
 	data []T
 }
 
-func NewSortedSlice[T constraints.Ordered]() *OrderedSlice[T] {
+func NewSortedSlice[T constraints.Ordered](initialData ...T) *OrderedSlice[T] {
+	if len(initialData) > 0 {
+		return &OrderedSlice[T]{data: initialData}
+	}
 	return &OrderedSlice[T]{data: make([]T, 0)}
 }
 
