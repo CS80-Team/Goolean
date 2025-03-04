@@ -17,8 +17,14 @@ func main() {
 	e := engine.NewEngine()
 	e.LoadDirectory(os.Getenv("DATASET_PATH"))
 
-	ret := e.Query("ahmed")
+	if len(os.Args) < 2 {
+		panic("Usage: go run main.go <query>")
+	}
+
+	query := os.Args[1]
+
+	ret := e.Query(query)
 	for i := 0; i < ret.GetLength(); i++ {
-		fmt.Println(e.GetDocumentByID(ret.At(i)).Name)
+		fmt.Println(e.GetDocumentByID(ret.At(i)).Name, ret.At(i))
 	}
 }

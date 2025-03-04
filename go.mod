@@ -1,10 +1,13 @@
 module Boolean-IR-System
 
-go 1.18
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7
 )
 
 require (

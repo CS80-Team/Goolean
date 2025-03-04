@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"Boolean-IR-System/internal"
+	"Boolean-IR-System/internal/structures"
 	"fmt"
 	"strings"
 )
@@ -12,11 +12,11 @@ const (
 	NOT = "NOT"
 )
 
-func (e *Engine) Query(query string) internal.SortedStructure {
-	var ops = internal.NewStack[string]()
-	var keys = internal.NewStack[string]()
-	var res internal.SortedStructure
-
+func (e *Engine) Query(query string) structures.OrderedStructure[int] {
+	var ops = structures.NewStack[string]()
+	var keys = structures.NewStack[string]()
+	var res structures.OrderedStructure[int]
+	fmt.Println("Constructing query:", query)
 	tokens := strings.Fields(query)
 
 	if len(tokens) == 0 {
@@ -27,62 +27,73 @@ func (e *Engine) Query(query string) internal.SortedStructure {
 		}
 		return e.index[tokens[0]]
 	}
-	
 
 	for _, token := range tokens {
 		if token == AND || token == OR || token == NOT {
 			ops.Push(token)
 		} else {
 			keys.Push(token)
-			
+
 			var notCount = 0
 			for !ops.IsEmpty() && ops.Peek() == NOT {
 				notCount++
 				ops.Pop()
 			}
 
-			if notCount%2 == 1 {
-				if res == nil {
-					res = e.inverse(e.index[keys.Pop()])
-				} else {
-					res = e.inverse(res)
-				}
-			}
-
 			if !ops.IsEmpty() {
 				if ops.Peek() == AND {
 					if res == nil {
-						if keys.GetSize() == 1 {
+						if keys.GetSize() < 1 {
 							panic("[Engine]: Invalid query, missing operator")
 						}
-						res = e.intersection(e.index[keys.Pop()], e.index[keys.Pop()])
+
+						if (notCount % 2) == 1 {
+							res = e.intersection(e.inverse(e.index[keys.Pop()]), e.index[keys.Pop()])
+						} else {
+							res = e.intersection(e.index[keys.Pop()], e.index[keys.Pop()])
+						}
 					} else {
 						if keys.IsEmpty() {
 							panic("[Engine]: Invalid query, missing operator")
 						}
-						res = e.intersection(res, e.index[keys.Pop()])
+
+						if (notCount % 2) == 1 {
+							res = e.intersection(res, e.inverse(e.index[keys.Pop()]))
+						} else {
+							res = e.intersection(res, e.index[keys.Pop()])
+						}
 					}
 				} else {
 					if res == nil {
-						if keys.GetSize() == 1 {
+						if keys.GetSize() < 1 {
 							panic("[Engine]: Invalid query, missing operator")
 						}
-						res = e.union(e.index[keys.Pop()], e.index[keys.Pop()])
+
+						if (notCount % 2) == 1 {
+							res = e.union(e.inverse(e.index[keys.Pop()]), e.index[keys.Pop()])
+						} else {
+							res = e.union(e.index[keys.Pop()], e.index[keys.Pop()])
+						}
 					} else {
 						if keys.IsEmpty() {
 							panic("[Engine]: Invalid query, missing operator")
 						}
-						res = e.union(res, e.index[keys.Pop()])
+
+						if (notCount % 2) == 1 {
+							res = e.union(res, e.inverse(e.index[keys.Pop()]))
+						} else {
+							res = e.union(res, e.index[keys.Pop()])
+						}
 					}
 				}
 				ops.Pop()
+				notCount = 0
 			} else {
 				if keys.GetSize() > 1 || (keys.GetSize() == 1 && res != nil) {
 					panic("[Engine]: Invalid query, missing operator")
 				}
 			}
 
-			notCount = 0
 			for !ops.IsEmpty() && ops.Peek() == NOT {
 				notCount++
 				ops.Pop()
@@ -101,15 +112,14 @@ func (e *Engine) Query(query string) internal.SortedStructure {
 	return res
 }
 
-func (e *Engine) inverse(s internal.SortedStructure) internal.SortedStructure {
-	var res = internal.NewSortedSlice()
-	fmt.Println("NOT")
+func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedStructure[int] {
+	var res = structures.NewSortedSlice[int]()
 	if s == nil {
 		return res
 	}
 
 	for i := 0; i < e.GetDocumentsSize(); i++ {
-		if _, found := s.BinarySearch(i); !found {
+		if idx := s.BinarySearch(i); idx != -1 {
 			res.InsertSorted(i)
 		}
 	}
@@ -117,16 +127,15 @@ func (e *Engine) inverse(s internal.SortedStructure) internal.SortedStructure {
 	return res
 }
 
-func (e *Engine) intersection(s1, s2 internal.SortedStructure) internal.SortedStructure {
-	var res = internal.NewSortedSlice()
-	fmt.Println("AND")
+func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structures.OrderedStructure[int] {
+	var res = structures.NewSortedSlice[int]()
 
 	if s1.GetLength() > s2.GetLength() {
 		s1, s2 = s2, s1
 	}
 
 	for i := 0; i < s1.GetLength(); i++ {
-		if _, found := s2.BinarySearch(s1.At(i)); found {
+		if idx := s2.BinarySearch(s1.At(i)); idx != -1 {
 			res.InsertSorted(s1.At(i))
 		}
 	}
@@ -134,10 +143,8 @@ func (e *Engine) intersection(s1, s2 internal.SortedStructure) internal.SortedSt
 	return res
 }
 
-func (e *Engine) union(s1, s2 internal.SortedStructure) internal.SortedStructure {
-	var res = internal.NewSortedSlice()
-
-	fmt.Println("OR")
+func (e *Engine) union(s1, s2 structures.OrderedStructure[int]) structures.OrderedStructure[int] {
+	var res = structures.NewSortedSlice[int]()
 
 	var i, j = 0, 0
 	for i < s1.GetLength() && j < s2.GetLength() {

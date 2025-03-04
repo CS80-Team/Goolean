@@ -15,12 +15,7 @@ func isLegible(ext string) bool {
 func (e *Engine) LoadDirectory(path string) {
 	var newDocs = LoadDocs(path)
 	for _, doc := range newDocs {
-		if _, ok := e.library[doc.Name]; !ok {
-			e.docs = append(e.docs, doc)
-			e.library[doc.Path] = struct{}{}
-			doc.ID = e.GetNextDocID()
-			e.parseDocument(doc)
-		}
+		e.AddDocument(doc)
 	}
 }
 
