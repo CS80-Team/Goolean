@@ -4,7 +4,6 @@ import (
 	"Boolean-IR-System/internal"
 	"Boolean-IR-System/internal/structures"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
@@ -12,10 +11,10 @@ func MockEngine() *Engine {
 	e := NewEngine()
 
 	e.docs = []*internal.Document{
-		{ID: 0, Name: "ahmedAndOmar.txt", Path: os.Getenv("DATASET_PATH")},
-		{ID: 1, Name: "ahmed.txt", Path: os.Getenv("DATASET_PATH")},
-		{ID: 2, Name: "omar.txt", Path: os.Getenv("DATASET_PATH")},
-		{ID: 3, Name: "test.txt", Path: os.Getenv("DATASET_PATH")},
+		{ID: 0, Name: "ahmedAndOmar.txt"},
+		{ID: 1, Name: "ahmed.txt"},
+		{ID: 2, Name: "omar.txt"},
+		{ID: 3, Name: "test.txt"},
 	}
 
 	e.index = map[string]structures.OrderedStructure[int]{
@@ -91,6 +90,105 @@ func TestQuery(t *testing.T) {
 				return
 			}
 
+			assert.Equal(t, len(tt.expected), result.GetLength(), "Unexpected result length")
+			for i, docID := range tt.expected {
+				assert.Equal(t, docID, result.At(i), "Unexpected document ID at index %d", i)
+			}
+		})
+	}
+}
+
+func TestInverse(t *testing.T) {
+	e := MockEngine()
+
+	tests := []struct {
+		name     string
+		input    structures.OrderedStructure[int]
+		expected []int
+	}{
+		{
+			name:     "Inverse of non-empty set",
+			input:    structures.NewSortedSlice[int](0, 1),
+			expected: []int{2, 3},
+		},
+		{
+			name:     "Inverse of empty set",
+			input:    structures.NewSortedSlice[int](),
+			expected: []int{0, 1, 2, 3},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := e.inverse(tt.input)
+			assert.Equal(t, len(tt.expected), result.GetLength(), "Unexpected result length")
+			for i, docID := range tt.expected {
+				assert.Equal(t, docID, result.At(i), "Unexpected document ID at index %d", i)
+			}
+		})
+	}
+}
+
+func TestIntersection(t *testing.T) {
+	e := MockEngine()
+
+	tests := []struct {
+		name     string
+		s1       structures.OrderedStructure[int]
+		s2       structures.OrderedStructure[int]
+		expected []int
+	}{
+		{
+			name:     "Intersection of two sets",
+			s1:       structures.NewSortedSlice[int](0, 1),
+			s2:       structures.NewSortedSlice[int](0, 1, 2),
+			expected: []int{0, 1},
+		},
+		{
+			name:     "Intersection with empty set",
+			s1:       structures.NewSortedSlice[int](0, 1),
+			s2:       structures.NewSortedSlice[int](),
+			expected: []int{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := e.intersection(tt.s1, tt.s2)
+			assert.Equal(t, len(tt.expected), result.GetLength(), "Unexpected result length")
+			for i, docID := range tt.expected {
+				assert.Equal(t, docID, result.At(i), "Unexpected document ID at index %d", i)
+			}
+		})
+	}
+}
+
+func TestUnion(t *testing.T) {
+	e := MockEngine()
+
+	tests := []struct {
+		name     string
+		s1       structures.OrderedStructure[int]
+		s2       structures.OrderedStructure[int]
+		expected []int
+	}{
+		{
+			name:     "Union of two sets",
+			s1:       structures.NewSortedSlice[int](0, 1),
+			s2:       structures.NewSortedSlice[int](0, 2),
+			expected: []int{0, 1, 2},
+		},
+		{
+			name:     "Union with empty set",
+			s1:       structures.NewSortedSlice[int](0, 1),
+			s2:       structures.NewSortedSlice[int](),
+			expected: []int{0, 1},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := e.union(tt.s1, tt.s2)
 			assert.Equal(t, len(tt.expected), result.GetLength(), "Unexpected result length")
 			for i, docID := range tt.expected {
 				assert.Equal(t, docID, result.At(i), "Unexpected document ID at index %d", i)
