@@ -119,7 +119,7 @@ func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedS
 	}
 
 	for i := 0; i < e.GetDocumentsSize(); i++ {
-		if idx := s.BinarySearch(i); idx != -1 {
+		if idx := s.BinarySearch(i); idx == -1 {
 			res.InsertSorted(i)
 		}
 	}
@@ -146,34 +146,13 @@ func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structure
 func (e *Engine) union(s1, s2 structures.OrderedStructure[int]) structures.OrderedStructure[int] {
 	var res = structures.NewSortedSlice[int]()
 
-	var i, j = 0, 0
-	for i < s1.GetLength() && j < s2.GetLength() {
-		if s1.At(i) == s2.At(j) {
-			res.InsertSorted(s1.At(i))
-			i++
-			j++
-		} else {
-			for i < s1.GetLength() && s1.At(i) < s2.At(j) {
-				res.InsertSorted(s1.At(i))
-				i++
-			}
-
-			if i < s1.GetLength() && s1.At(i) > s2.At(j) {
-				for j < s2.GetLength() && s2.At(j) < s1.At(i) {
-					res.InsertSorted(s2.At(j))
-					j++
-				}
-			}
-		}
-	}
-
-	for i < s1.GetLength() {
+	for i := range s1.GetLength() {
 		res.InsertSorted(s1.At(i))
-		i++
 	}
-	for j < s2.GetLength() {
-		res.InsertSorted(s2.At(j))
-		j++
+
+	for i := range s2.GetLength() {
+		res.InsertSorted(s2.At(i))
 	}
+
 	return res
 }
