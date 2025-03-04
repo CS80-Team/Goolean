@@ -15,7 +15,10 @@ func main() {
 	}
 
 	e := engine.NewEngine()
-	e.LoadDirectory(os.Getenv("TEST_DATASET_PATH"))
-	fmt.Println(os.Getenv("TEST_DATASET_PATH"))
-	// e.Query("omar", "ahmed", "AND")
+	e.LoadDirectory(os.Getenv("DATASET_PATH"))
+
+	ret := e.Query("ahmed")
+	for i := 0; i < ret.GetLength(); i++ {
+		fmt.Println(e.GetDocumentByID(ret.At(i)).Name)
+	}
 }
