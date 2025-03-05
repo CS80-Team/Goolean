@@ -5,6 +5,7 @@ import (
 	"Boolean-IR-System/shell"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strconv"
@@ -47,18 +48,22 @@ func main() {
 		Name:        "open",
 		Description: "Open a document by ID in the default editor",
 		Handler: func(args []string) shell.Status {
+
 			id, err := strconv.Atoi(args[0])
 			if err != nil {
 				s.Write("Invalid document ID\n")
+				return shell.FAIL
 			}
 			if id < 0 || id >= len(engine.GetDocuments()) {
-				s.Write("Document ID out of range\n")
+				s.Write("Document ID out of range, Docs Ids [0" + strconv.Itoa(len(engine.GetDocuments())-1) + "]\n")
+				return shell.FAIL
 			}
-
+			s.Write("Opening document: " + engine.GetDocumentByID(id).Name)
 			doc := engine.GetDocumentByID(id)
-			err = openFile(doc.Path + doc.Name)
+			err = openFile(filepath.Join(doc.Path, doc.Name))
 			if err != nil {
 				s.Write("Error opening file\n")
+				return shell.FAIL
 			}
 
 			return shell.OK
@@ -167,37 +172,6 @@ func main() {
 			return shell.OK
 		},
 		Usage: "load <document_path>",
-	})
-
-	s.RegisterCommand(shell.Command{
-		Name:        "open",
-		Description: "Open a document by ID in the default editor",
-		Handler: func(args []string) shell.Status {
-			if len(args) != 1 {
-				s.Write("Invalid number of arguments\n")
-				return shell.FAIL
-			}
-
-			id, err := strconv.Atoi(args[0])
-			if err != nil {
-				s.Write("Invalid document ID\n")
-				return shell.FAIL
-			}
-
-			if id < 0 || id >= len(engine.GetDocuments()) {
-				s.Write("Document ID out of range\n")
-				return shell.FAIL
-			}
-
-			err = openFile(engine.GetDocumentByID(id).Path + engine.GetDocumentByID(id).Name)
-			if err != nil {
-				s.Write("Error opening file\n")
-				return shell.FAIL
-			}
-
-			return shell.OK
-		},
-		Usage: "open <document_id>",
 	})
 
 	s.RegisterEarlyExecCommand(shell.EarlyCommand{

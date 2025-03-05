@@ -21,7 +21,7 @@ func getAllTokens(text string) []string {
 
 	for idx < len(text) {
 		token := getNextToken(&text, &idx)
-		tokens = append(tokens, token)
+		tokens = append(tokens, NormalizeToken(token))
 	}
 
 	return tokens

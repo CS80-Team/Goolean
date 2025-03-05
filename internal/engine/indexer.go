@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"unicode"
 )
 
 func (e *Engine) parseDocument(doc *internal.Document) {
@@ -30,6 +29,7 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 		var token string
 		for idx < len(line) {
 			token = getNextToken(&line, &idx)
+			token = NormalizeToken(token)
 
 			if _, ok := e.index[token]; !ok {
 				e.index[token] = &structures.OrderedSlice[int]{}
@@ -47,7 +47,7 @@ func getNextToken(line *string, idx *int) string {
 	}
 
 	for *idx < len(*line) && !isDelimiter(rune((*line)[*idx])) {
-		token += string(unicode.ToLower(rune((*line)[*idx]))) // Normalize to lowercase
+		token += string(rune((*line)[*idx]))
 		*idx++
 	}
 

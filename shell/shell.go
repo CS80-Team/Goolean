@@ -3,6 +3,8 @@ package shell
 import (
 	"io"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -55,7 +57,17 @@ func NewShell() *shell {
 		Name:        "clear",
 		Description: "Clear the screen",
 		Handler: func(args []string) Status {
-			print("\033[H\033[2J")
+			switch runtime.GOOS {
+			case "windows":
+				cmd := exec.Command("cmd", "/c", "cls")
+				cmd.Stdout = os.Stdout
+				cmd.Run()
+			default:
+				cmd := exec.Command("clear")
+				cmd.Stdout = os.Stdout
+				cmd.Run()
+			}
+
 			return OK
 		},
 		Usage: "clear",
