@@ -31,6 +31,10 @@ func (e *Engine) GetKeyIndex(key string) structures.OrderedStructure[int] {
 	return e.index[key]
 }
 
+func (e *Engine) GetIndexSize() int {
+	return len(e.index)
+}
+
 func (e *Engine) GetDocumentByID(id int) *internal.Document {
 	if id < 0 && id >= len(e.docs) {
 		panic("[Engine]: Document ID out of range")

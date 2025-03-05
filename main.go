@@ -43,24 +43,22 @@ func main() {
 	s.SetInputStream(os.Stdin)
 	s.SetOutputStream(os.Stdout)
 
-	s.WriteOutput("Welcome to the Boolean IR System shell, type `help` for list of commands\n")
-
 	s.RegisterCommand(shell.Command{
 		Name:        "open",
 		Description: "Open a document by ID in the default editor",
 		Handler: func(args []string) shell.Status {
 			id, err := strconv.Atoi(args[0])
 			if err != nil {
-				s.WriteOutput("Invalid document ID\n")
+				s.Write("Invalid document ID\n")
 			}
 			if id < 0 || id >= len(engine.GetDocuments()) {
-				s.WriteOutput("Document ID out of range\n")
+				s.Write("Document ID out of range\n")
 			}
 
 			doc := engine.GetDocumentByID(id)
 			err = openFile(doc.Path + doc.Name)
 			if err != nil {
-				s.WriteOutput("Error opening file\n")
+				s.Write("Error opening file\n")
 			}
 
 			return shell.OK
@@ -75,12 +73,12 @@ func main() {
 			res := engine.Query(args)
 
 			if res == nil || res.GetLength() == 0 {
-				s.WriteOutput("No results found\n")
+				s.Write("No results found\n")
 				return shell.OK
 			}
 
 			for i := 0; i < res.GetLength(); i++ {
-				s.WriteOutput(
+				s.Write(
 					strconv.Itoa(engine.GetDocumentByID(res.At(i)).ID) +
 						". " +
 						engine.GetDocumentByID(res.At(i)).Name + "\n")
@@ -100,7 +98,7 @@ func main() {
 			if len(args) == 0 {
 				for i := 0; i < len(engine.GetDocuments()); i++ {
 					doc := engine.GetDocumentByID(i)
-					s.WriteOutput(doc.Name + " " + doc.Path + " " + strconv.Itoa(doc.ID) + "\n")
+					s.Write(doc.Name + " " + doc.Path + " " + strconv.Itoa(doc.ID) + "\n")
 				}
 				stat = shell.OK
 			} else {
@@ -110,13 +108,13 @@ func main() {
 
 				for _, arg := range args {
 					if !slices.Contains(validArgs, arg) {
-						s.WriteOutput("Invalid argument: " + arg + "\n")
+						s.Write("Invalid argument: " + arg + "\n")
 						stat = shell.FAIL
 						break
 					}
 
 					if seen[arg] {
-						s.WriteOutput("Duplicate argument: " + arg + "\n")
+						s.Write("Duplicate argument: " + arg + "\n")
 						stat = shell.FAIL
 						break
 					}
@@ -133,22 +131,22 @@ func main() {
 					for j := 0; j < len(args); j++ {
 						switch args[j] {
 						case "-name":
-							s.WriteOutput(doc.Name)
+							s.Write(doc.Name)
 						case "-path":
-							s.WriteOutput(doc.Path)
+							s.Write(doc.Path)
 						case "-id":
-							s.WriteOutput(strconv.Itoa(doc.ID))
+							s.Write(strconv.Itoa(doc.ID))
 						}
-						s.WriteOutput(" ")
+						s.Write(" ")
 					}
-					s.WriteOutput("\n")
+					s.Write("\n")
 				}
 			}
 
 		end:
 
 			if stat == shell.OK {
-				s.WriteOutput("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
+				s.Write("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
 			}
 
 			return stat
@@ -161,7 +159,7 @@ func main() {
 		Description: "Load a new document into the engine",
 		Handler: func(args []string) shell.Status {
 			if len(args) != 1 {
-				s.WriteOutput("Invalid number of arguments\n")
+				s.Write("Invalid number of arguments\n")
 				return shell.FAIL
 			}
 
@@ -176,24 +174,24 @@ func main() {
 		Description: "Open a document by ID in the default editor",
 		Handler: func(args []string) shell.Status {
 			if len(args) != 1 {
-				s.WriteOutput("Invalid number of arguments\n")
+				s.Write("Invalid number of arguments\n")
 				return shell.FAIL
 			}
 
 			id, err := strconv.Atoi(args[0])
 			if err != nil {
-				s.WriteOutput("Invalid document ID\n")
+				s.Write("Invalid document ID\n")
 				return shell.FAIL
 			}
 
 			if id < 0 || id >= len(engine.GetDocuments()) {
-				s.WriteOutput("Document ID out of range\n")
+				s.Write("Document ID out of range\n")
 				return shell.FAIL
 			}
 
 			err = openFile(engine.GetDocumentByID(id).Path + engine.GetDocumentByID(id).Name)
 			if err != nil {
-				s.WriteOutput("Error opening file\n")
+				s.Write("Error opening file\n")
 				return shell.FAIL
 			}
 
@@ -202,5 +200,16 @@ func main() {
 		Usage: "open <document_id>",
 	})
 
-	s.Run()
+	s.RegisterEarlyExecCommand(shell.EarlyCommand{
+		Name:        "engine-stats",
+		Description: "Displays the total number of documents and keys in the engine",
+		Handler: func() {
+			s.Write("Engine stats:\n")
+			s.Write("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
+			s.Write("Total keys: " + strconv.Itoa(engine.GetIndexSize()) + "\n")
+		},
+		Usage: "engine-stats",
+	})
+
+	s.Run("Welcome to the Boolean IR System shell, type `help` for list of commands\n")
 }
