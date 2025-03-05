@@ -43,6 +43,8 @@ func main() {
 	s.SetInputStream(os.Stdin)
 	s.SetOutputStream(os.Stdout)
 
+	s.WriteOutput("Welcome to the Boolean IR System shell, type `help` for list of commands\n")
+
 	s.RegisterCommand(shell.Command{
 		Name:        "open",
 		Description: "Open a document by ID in the default editor",
@@ -64,14 +66,6 @@ func main() {
 			return shell.OK
 		},
 		Usage: "open <document_id>",
-	})
-
-	s.RegisterCommand(shell.Command{
-		Name:        "exit",
-		Description: "Exit the shell",
-		Handler: func(args []string) shell.Status {
-			return shell.EXIT
-		},
 	})
 
 	s.RegisterCommand(shell.Command{
@@ -99,57 +93,67 @@ func main() {
 
 	s.RegisterCommand(shell.Command{
 		Name:        "list",
-		Description: "List all documents, displayable by name or/and path or/and ID or/and all",
+		Description: "List all documents, displayable by name or/and path or/and ID",
 		Handler: func(args []string) shell.Status {
+			var stat shell.Status = shell.OK
+
 			if len(args) == 0 {
-				s.WriteOutput("No arguments provided\n")
-				return shell.FAIL
-			}
-
-			var validArgs = []string{"-name", "-path", "-id", "-all"}
-			var seen = make(map[string]bool)
-
-			for _, arg := range args {
-				if !slices.Contains(validArgs, arg) {
-					s.WriteOutput("Invalid argument: " + arg + "\n")
-					return shell.FAIL
-				}
-
-				if seen[arg] {
-					s.WriteOutput("Duplicate argument: " + arg + "\n")
-					return shell.FAIL
-				}
-
-				seen[arg] = true
-			}
-
-			if args[0] == "-all" {
 				for i := 0; i < len(engine.GetDocuments()); i++ {
 					doc := engine.GetDocumentByID(i)
 					s.WriteOutput(doc.Name + " " + doc.Path + " " + strconv.Itoa(doc.ID) + "\n")
 				}
-				return shell.OK
-			}
+				stat = shell.OK
+			} else {
 
-			for i := 0; i < len(engine.GetDocuments()); i++ {
-				doc := engine.GetDocumentByID(i)
-				for j := 0; j < len(args); j++ {
-					switch args[j] {
-					case "-name":
-						s.WriteOutput(doc.Name)
-					case "-path":
-						s.WriteOutput(doc.Path)
-					case "-id":
-						s.WriteOutput(strconv.Itoa(doc.ID))
+				var validArgs = []string{"-name", "-path", "-id"}
+				var seen = make(map[string]bool)
+
+				for _, arg := range args {
+					if !slices.Contains(validArgs, arg) {
+						s.WriteOutput("Invalid argument: " + arg + "\n")
+						stat = shell.FAIL
+						break
 					}
-					s.WriteOutput(" ")
+
+					if seen[arg] {
+						s.WriteOutput("Duplicate argument: " + arg + "\n")
+						stat = shell.FAIL
+						break
+					}
+
+					seen[arg] = true
 				}
-				s.WriteOutput("\n")
+
+				if stat == shell.FAIL {
+					goto end
+				}
+
+				for i := 0; i < len(engine.GetDocuments()); i++ {
+					doc := engine.GetDocumentByID(i)
+					for j := 0; j < len(args); j++ {
+						switch args[j] {
+						case "-name":
+							s.WriteOutput(doc.Name)
+						case "-path":
+							s.WriteOutput(doc.Path)
+						case "-id":
+							s.WriteOutput(strconv.Itoa(doc.ID))
+						}
+						s.WriteOutput(" ")
+					}
+					s.WriteOutput("\n")
+				}
 			}
 
-			return shell.OK
+		end:
+
+			if stat == shell.OK {
+				s.WriteOutput("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
+			}
+
+			return stat
 		},
-		Usage: "list <-name | -path | -id | -all>",
+		Usage: "list <-name | -path | -id>",
 	})
 
 	s.RegisterCommand(shell.Command{

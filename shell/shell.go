@@ -21,20 +21,48 @@ type shell struct {
 }
 
 func NewShell() *shell {
-	return &shell{
-		commands: make(map[string]Command),
+	sh := &shell{
+		commands:  make(map[string]Command),
+		inStream:  os.Stdin,
+		outStream: os.Stdout,
 	}
+
+	sh.RegisterCommand(Command{
+		Name:        "exit",
+		Description: "Exit the shell",
+		Handler: func(args []string) Status {
+			return EXIT
+		},
+		Usage: "exit",
+	})
+
+	sh.RegisterCommand(Command{
+		Name:        "help",
+		Description: "List all available commands",
+		Handler: func(args []string) Status {
+			for _, cmd := range sh.GetCommands() {
+				sh.WriteOutput(cmd.Name + ": " + cmd.Description + "\n")
+			}
+			return OK
+		},
+		Usage: "help",
+	})
+
+	sh.RegisterCommand(Command{
+		Name:        "clear",
+		Description: "Clear the screen",
+		Handler: func(args []string) Status {
+			print("\033[H\033[2J")
+			return OK
+		},
+		Usage: "clear",
+	})
+
+	return sh
 }
 
 func (s *shell) RegisterCommand(cmd Command) {
 	s.commands[cmd.Name] = cmd
-}
-
-func (s *shell) Help() {
-	for _, cmd := range s.GetCommands() {
-		s.WriteOutput(cmd.Name + ": " + cmd.Description + "\n")
-		s.WriteOutput("\tUsage: " + cmd.Usage + "\n")
-	}
 }
 
 func (s *shell) ExecuteCommand(cmd string, args []string) Status {
@@ -43,11 +71,6 @@ func (s *shell) ExecuteCommand(cmd string, args []string) Status {
 	}
 
 	if cmd == "" {
-		return OK
-	}
-
-	if cmd == "help" {
-		s.Help()
 		return OK
 	}
 
