@@ -11,21 +11,21 @@ import (
 type Status string
 
 const (
-	OK        Status = "OK"
-	FAIL      Status = "FAIL"
-	EXIT      Status = "EXIT"
-	NOT_FOUND Status = "NOT_FOUND"
+	OK       Status = "OK"
+	FAIL     Status = "FAIL"
+	EXIT     Status = "EXIT"
+	NotFound Status = "NOT_FOUND"
 )
 
-type shell struct {
+type Shell struct {
 	commands          map[string]Command
 	earlyExecCommands []EarlyCommand
 	inStream          io.Reader
 	outStream         io.Writer
 }
 
-func NewShell() *shell {
-	sh := &shell{
+func NewShell() *Shell {
+	sh := &Shell{
 		commands:  make(map[string]Command),
 		inStream:  os.Stdin,
 		outStream: os.Stdout,
@@ -61,11 +61,11 @@ func NewShell() *shell {
 			case "windows":
 				cmd := exec.Command("cmd", "/c", "cls")
 				cmd.Stdout = os.Stdout
-				cmd.Run()
+				_ = cmd.Run()
 			default:
 				cmd := exec.Command("clear")
 				cmd.Stdout = os.Stdout
-				cmd.Run()
+				_ = cmd.Run()
 			}
 
 			return OK
@@ -76,21 +76,21 @@ func NewShell() *shell {
 	return sh
 }
 
-func (s *shell) RegisterCommand(cmd Command) {
+func (s *Shell) RegisterCommand(cmd Command) {
 	s.commands[cmd.Name] = cmd
 }
 
-func (s *shell) RegisterEarlyExecCommand(cmd EarlyCommand) {
+func (s *Shell) RegisterEarlyExecCommand(cmd EarlyCommand) {
 	s.earlyExecCommands = append(s.earlyExecCommands, cmd)
 }
 
-func (s *shell) executeEarlyCommands() {
+func (s *Shell) executeEarlyCommands() {
 	for _, cmd := range s.earlyExecCommands {
 		cmd.Handler()
 	}
 }
 
-func (s *shell) executeCommand(cmd string, args []string) Status {
+func (s *Shell) executeCommand(cmd string, args []string) Status {
 	if strings.ToUpper(cmd) == string(EXIT) {
 		return EXIT
 	}
@@ -103,10 +103,10 @@ func (s *shell) executeCommand(cmd string, args []string) Status {
 		return command.Handler(args)
 	}
 
-	return NOT_FOUND
+	return NotFound
 }
 
-func (s *shell) GetCommands() []Command {
+func (s *Shell) GetCommands() []Command {
 	var cmds []Command
 	for _, cmd := range s.commands {
 		cmds = append(cmds, cmd)
@@ -114,15 +114,15 @@ func (s *shell) GetCommands() []Command {
 	return cmds
 }
 
-func (s *shell) SetInputStream(in io.Reader) {
+func (s *Shell) SetInputStream(in io.Reader) {
 	s.inStream = in
 }
 
-func (s *shell) SetOutputStream(out io.Writer) {
+func (s *Shell) SetOutputStream(out io.Writer) {
 	s.outStream = out
 }
 
-func (s *shell) read() string {
+func (s *Shell) read() string {
 	var input string
 	buf := make([]byte, 1024)
 	for {
@@ -139,14 +139,14 @@ func (s *shell) read() string {
 	return input
 }
 
-func (s *shell) Write(output string) {
-	s.outStream.Write([]byte(output))
+func (s *Shell) Write(output string) {
+	_, _ = s.outStream.Write([]byte(output))
 }
 
-func (s *shell) Run(welcMessege string) {
+func (s *Shell) Run(welcomeMessage string) {
 	var stat Status
 	s.executeCommand("clear", nil)
-	s.Write(welcMessege)
+	s.Write(welcomeMessage)
 	for {
 		s.Write("\n")
 		s.executeEarlyCommands()
@@ -160,7 +160,7 @@ func (s *shell) Run(welcMessege string) {
 			break
 		} else if stat == FAIL {
 			s.Write(s.commands[cmd].Usage + "\n")
-		} else if stat == NOT_FOUND {
+		} else if stat == NotFound {
 			s.Write("Command not found\n")
 		}
 	}
@@ -177,6 +177,6 @@ func parseInput(input string) (string, []string) {
 	return tokens[0], tokens[1:]
 }
 
-func (s *shell) Exit() {
+func (s *Shell) Exit() {
 	os.Exit(0)
 }

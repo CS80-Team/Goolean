@@ -22,14 +22,16 @@ func (e *Engine) Query(tokens []string) structures.OrderedStructure[int] {
 		if tokens[0] == NOT || tokens[0] == AND || tokens[0] == OR {
 			panic("[Engine]: Invalid query, missing operand")
 		}
-		return e.index[NormalizeToken(tokens[0])]
+		tokenized := e.ProcessToken(tokens[0])
+		return e.index[tokenized]
 	}
 
 	for _, token := range tokens {
 		if token == AND || token == OR || token == NOT {
 			ops.Push(token)
 		} else {
-			token = NormalizeToken(token)
+			token = e.ProcessToken(token)
+
 			keys.Push(token)
 
 			var notCount = 0

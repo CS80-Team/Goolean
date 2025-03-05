@@ -3,13 +3,20 @@ package engine
 import (
 	"Boolean-IR-System/internal"
 	"Boolean-IR-System/internal/structures"
+	"Boolean-IR-System/internal/textprocessing"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+var processor = textprocessing.NewDefaultProcessor(
+	textprocessing.NewNormalizer(),
+	textprocessing.NewStemmer(),
+	textprocessing.NewStopWordRemover(),
+)
+
 func MockEngine() *Engine {
-	e := NewEngine()
+	e := NewEngine(processor)
 
 	e.docs = []*internal.Document{
 		{ID: 0, Name: "ahmedAndOmar.txt"},

@@ -6,6 +6,7 @@ toolchain go1.24.0
 
 require (
 	github.com/joho/godotenv v1.5.1
+	github.com/kljensen/snowball v0.10.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7
 )
