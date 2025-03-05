@@ -55,7 +55,7 @@ func main() {
 				return shell.FAIL
 			}
 			if id < 0 || id >= len(engine.GetDocuments()) {
-				s.Write("Document ID out of range, Docs Ids [0" + strconv.Itoa(len(engine.GetDocuments())-1) + "]\n")
+				s.Write("Document ID out of range, Docs Ids [0, " + strconv.Itoa(len(engine.GetDocuments())-1) + "]\n")
 				return shell.FAIL
 			}
 			s.Write("Opening document: " + engine.GetDocumentByID(id).Name)
@@ -88,6 +88,8 @@ func main() {
 						". " +
 						engine.GetDocumentByID(res.At(i)).Name + "\n")
 			}
+
+			s.Write("Total documents found: " + strconv.Itoa(res.GetLength()) + "\n")
 
 			return shell.OK
 		},

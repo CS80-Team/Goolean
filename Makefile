@@ -21,3 +21,8 @@ run: deps
 build: deps test
 	@echo "Building the application..."
 	go build -o bin/boolean-ir-system main.go
+
+.PHONY: run
+run: deps test
+	@echo "Running the application..."
+	go run main.go
