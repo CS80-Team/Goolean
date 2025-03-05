@@ -40,7 +40,7 @@ The Boolean IR (Information Retrieval) System is a search engine that allows use
 
 1. Clone the repository:
    ```sh
-   git clone <repository-url>
+   git clone https://github.com/CS80-Team/Boolean-IR-System/
    cd boolean-ir-system
    ```
 2. Build the project:
