@@ -2,7 +2,6 @@ package engine
 
 import (
 	"Boolean-IR-System/internal/structures"
-	"fmt"
 	"strings"
 )
 
@@ -12,12 +11,10 @@ const (
 	NOT = "NOT"
 )
 
-func (e *Engine) Query(query string) structures.OrderedStructure[int] {
+func (e *Engine) Query(tokens []string) structures.OrderedStructure[int] {
 	var ops = structures.NewStack[string]()
 	var keys = structures.NewStack[string]()
 	var res structures.OrderedStructure[int]
-	fmt.Println("Constructing query:", query)
-	tokens := strings.Fields(query)
 
 	if len(tokens) == 0 {
 		return nil
@@ -110,6 +107,10 @@ func (e *Engine) Query(query string) structures.OrderedStructure[int] {
 	}
 
 	return res
+}
+
+func (e *Engine) QueryString(query string) structures.OrderedStructure[int] {
+	return e.Query(strings.Fields(query))
 }
 
 func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedStructure[int] {

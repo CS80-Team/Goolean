@@ -3,8 +3,9 @@ package engine
 import (
 	"Boolean-IR-System/internal"
 	"Boolean-IR-System/internal/structures"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func MockEngine() *Engine {
@@ -79,12 +80,12 @@ func TestQuery(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "Invalid query (missing operand)" {
 				assert.Panics(t, func() {
-					e.Query(tt.query)
+					e.QueryString(tt.query)
 				}, "Expected panic for invalid query")
 				return
 			}
 
-			result := e.Query(tt.query)
+			result := e.QueryString(tt.query)
 			if tt.expected == nil {
 				assert.Nil(t, result, "Expected nil result")
 				return
