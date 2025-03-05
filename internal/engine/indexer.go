@@ -29,7 +29,11 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 		var token string
 		for idx < len(line) {
 			token = getNextToken(&line, &idx)
-			token = NormalizeToken(token)
+
+			token = e.ProcessToken(token)
+			if token == "" {
+				continue
+			}
 
 			if _, ok := e.index[token]; !ok {
 				e.index[token] = &structures.OrderedSlice[int]{}

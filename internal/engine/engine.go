@@ -3,21 +3,37 @@ package engine
 import (
 	"Boolean-IR-System/internal"
 	"Boolean-IR-System/internal/structures"
+	"Boolean-IR-System/internal/textprocessing"
 	// "path"
 )
 
 type Engine struct {
-	docs    []*internal.Document
-	index   map[string]structures.OrderedStructure[int]
-	library map[string]struct{}
+	docs      []*internal.Document
+	index     map[string]structures.OrderedStructure[int]
+	library   map[string]struct{}
+	processor textprocessing.Processor
 }
 
-func NewEngine() *Engine {
+func NewEngine(processor textprocessing.Processor) *Engine {
 	return &Engine{
-		docs:    make([]*internal.Document, 0),
-		index:   make(map[string]structures.OrderedStructure[int]),
-		library: make(map[string]struct{}),
+		docs:      make([]*internal.Document, 0),
+		index:     make(map[string]structures.OrderedStructure[int]),
+		library:   make(map[string]struct{}),
+		processor: processor,
 	}
+}
+
+func (e *Engine) AddDocument(doc *internal.Document) {
+	if _, ok := e.library[doc.Name]; !ok {
+		doc.ID = e.GetNextDocID()
+		e.docs = append(e.docs, doc)
+		e.library[doc.Path] = struct{}{}
+		e.parseDocument(doc)
+	}
+}
+
+func (e *Engine) ProcessToken(token string) string {
+	return e.processor.Process(token)
 }
 
 func (e *Engine) GetDocuments() []*internal.Document {
@@ -49,13 +65,4 @@ func (e *Engine) GetDocumentsSize() int {
 
 func (e *Engine) GetNextDocID() int {
 	return e.GetDocumentsSize()
-}
-
-func (e *Engine) AddDocument(doc *internal.Document) {
-	if _, ok := e.library[doc.Name]; !ok {
-		doc.ID = e.GetNextDocID()
-		e.docs = append(e.docs, doc)
-		e.library[doc.Path] = struct{}{}
-		e.parseDocument(doc)
-	}
 }

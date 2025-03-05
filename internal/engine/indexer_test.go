@@ -1,33 +1,33 @@
 package engine
 
 import (
-	// "Boolean-IR-System/internal"
 	"Boolean-IR-System/internal"
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	// "github.com/stretchr/testify/require"
 	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
 	BasePath = "../../"
 )
 
-func getAllTokens(text string) []string {
+func getAllTokens(e *Engine, text string) []string {
 	var idx int
 	var tokens []string
 
 	for idx < len(text) {
 		token := getNextToken(&text, &idx)
-		tokens = append(tokens, NormalizeToken(token))
+		tokens = append(tokens, e.ProcessToken(token))
 	}
 
 	return tokens
 }
 
 func TestTokenization(t *testing.T) {
+	e := NewEngine(processor)
+
 	t.Run("Test Tokenizing strings", func(t *testing.T) {
 		testcases := []struct {
 			input    string
@@ -56,7 +56,7 @@ func TestTokenization(t *testing.T) {
 		}
 
 		for _, tc := range testcases {
-			tokens := getAllTokens(tc.input)
+			tokens := getAllTokens(e, tc.input)
 			assert.Equal(t, tc.expected, tokens, "Expected tokens to match")
 		}
 	})
@@ -77,20 +77,20 @@ func TestTokenization(t *testing.T) {
 		}
 
 		for _, tc := range testcases {
-			tokens := getAllTokens(tc.input)
+			tokens := getAllTokens(e, tc.input)
 			assert.Equal(t, tc.expected, tokens, "Expected tokens to match")
 		}
 	})
 }
 
 func TestIndexing(t *testing.T) {
-	t.Run("Test Indexing aplhabets", func(t *testing.T) {
+	t.Run("Test Indexing alphabets", func(t *testing.T) {
 		err := godotenv.Load(BasePath + ".env")
 		if err != nil {
 			panic("Error loading .env file")
 		}
 
-		e := NewEngine()
+		e := NewEngine(processor)
 		e.parseDocument(&internal.Document{
 			Path: BasePath + os.Getenv("TEST_DATASET_PATH"), Name: "alphabet.txt",
 		})
@@ -103,7 +103,7 @@ func TestIndexing(t *testing.T) {
 			panic("Error loading .env file")
 		}
 
-		e := NewEngine()
+		e := NewEngine(processor)
 		e.parseDocument(&internal.Document{
 			Path: BasePath + os.Getenv("TEST_DATASET_PATH"), Name: "1to100.txt",
 		})
@@ -116,7 +116,7 @@ func TestIndexing(t *testing.T) {
 			panic("Error loading .env file")
 		}
 
-		e := NewEngine()
+		e := NewEngine(processor)
 		e.parseDocument(&internal.Document{
 			Path: BasePath + os.Getenv("TEST_DATASET_PATH"), Name: "duplicates.txt",
 		})
@@ -129,7 +129,7 @@ func TestIndexing(t *testing.T) {
 			panic("Error loading .env file")
 		}
 
-		e := NewEngine()
+		e := NewEngine(processor)
 		e.parseDocument(&internal.Document{
 			Path: BasePath + os.Getenv("TEST_DATASET_PATH"), Name: "lowercaseNormalization.txt",
 		})

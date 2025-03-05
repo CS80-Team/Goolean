@@ -2,6 +2,7 @@ package main
 
 import (
 	"Boolean-IR-System/internal/engine"
+	"Boolean-IR-System/internal/textprocessing"
 	"Boolean-IR-System/shell"
 	"os"
 	"os/exec"
@@ -36,7 +37,13 @@ func main() {
 		panic("Error loading .env file")
 	}
 
-	engine := engine.NewEngine()
+	txtProcessor := textprocessing.NewDefaultProcessor(
+		textprocessing.NewNormalizer(),
+		textprocessing.NewStemmer(),
+		textprocessing.NewStopWordRemover(),
+	)
+
+	engine := engine.NewEngine(txtProcessor)
 	engine.LoadDirectory(os.Getenv("DATASET_PATH"))
 
 	s := shell.NewShell()
@@ -100,7 +107,7 @@ func main() {
 		Name:        "list",
 		Description: "List all documents, displayable by name or/and path or/and ID",
 		Handler: func(args []string) shell.Status {
-			var stat shell.Status = shell.OK
+			var stat = shell.OK
 
 			if len(args) == 0 {
 				for i := 0; i < len(engine.GetDocuments()); i++ {
