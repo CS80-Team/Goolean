@@ -147,6 +147,10 @@ func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedS
 		}
 	}
 
+	for i := j; i < s.GetLength(); i++ {
+		res.InsertSorted(s.At(i))
+	}
+
 	return res
 }
 
