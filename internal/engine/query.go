@@ -139,16 +139,19 @@ func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedS
 	}
 
 	j := 0
-	for i := 0; i < e.GetDocumentsSize() && j < s.GetLength(); i++ {
+	i := 0
+	for j < s.GetLength() {
 		if i == s.At(j) {
 			j++
 		} else {
 			res.InsertSorted(i)
 		}
+		i++
 	}
 
-	for i := j; i < s.GetLength(); i++ {
-		res.InsertSorted(s.At(i))
+	for i < e.GetDocumentsSize() {
+		res.InsertSorted(i)
+		i++
 	}
 
 	return res
