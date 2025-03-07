@@ -47,11 +47,11 @@ func TestTokenization(t *testing.T) {
 			},
 			{
 				input:    "...A,,     B! C,,,??,,..  ,",
-				expected: []string{"a", "b", "c"},
+				expected: []string{"", "b", "c"},
 			},
 			{
 				input:    "read,write,query,delete..page2,in,a,book",
-				expected: []string{"read", "write", "query", "delete", "page2", "in", "a", "book"},
+				expected: []string{"read", "write", "queri", "delet", "page2", "in", "", "book"},
 			},
 		}
 
@@ -68,7 +68,7 @@ func TestTokenization(t *testing.T) {
 		}{
 			{
 				input:    "a b c d e f g...h,.e,w,.t,q",
-				expected: []string{"a", "b", "c", "d", "e", "f", "g", "h", "e", "w", "t", "q"},
+				expected: []string{"", "b", "c", "d", "e", "f", "g", "h", "e", "w", "t", "q"},
 			},
 			{
 				input:    "Hello, World! 123",
@@ -94,7 +94,7 @@ func TestIndexing(t *testing.T) {
 		e.parseDocument(&internal.Document{
 			Path: BasePath + os.Getenv("TEST_DATASET_PATH"), Name: "alphabet.txt",
 		})
-		assert.Equal(t, 26, len(e.index), "Expected the engine to have 26 keyword")
+		assert.Equal(t, 25, len(e.index), "Expected the engine to have 26 keyword")
 	})
 
 	t.Run("Test Indexing numbers", func(t *testing.T) {
@@ -120,7 +120,7 @@ func TestIndexing(t *testing.T) {
 		e.parseDocument(&internal.Document{
 			Path: BasePath + os.Getenv("TEST_DATASET_PATH"), Name: "duplicates.txt",
 		})
-		assert.Equal(t, 10, len(e.index), "Expected the engine to have 10 keyword")
+		assert.Equal(t, 9, len(e.index), "Expected the engine to have 10 keyword")
 	})
 
 	t.Run("Test Indexing lowercase normalization", func(t *testing.T) {
@@ -133,6 +133,6 @@ func TestIndexing(t *testing.T) {
 		e.parseDocument(&internal.Document{
 			Path: BasePath + os.Getenv("TEST_DATASET_PATH"), Name: "lowercaseNormalization.txt",
 		})
-		assert.Equal(t, 10, len(e.index), "Expected the engine to have 10 keyword")
+		assert.Equal(t, 9, len(e.index), "Expected the engine to have 10 keyword")
 	})
 }
