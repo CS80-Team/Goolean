@@ -52,7 +52,7 @@ The Boolean IR (Information Retrieval) System is a search engine that allows use
 
 ## System Overview
 
-![System Overview](docs/BIRSystemOverview.png)
+![System Overview](https://github.com/CS80-Team/Boolean-IR-System/blob/master/docs/BIRSystemOverview.png)
 
 ## Usage Example
 
