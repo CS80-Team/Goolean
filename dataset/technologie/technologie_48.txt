@@ -1,0 +1,6 @@
+Startup Deploying AI Chatbots With “Conversational Memory” for More Natural Exchanges
+TOPICS:Artificial IntelligenceCSAILMachine LearningMIT
+By ZACH WINN, MASSACHUSETTS INSTITUTE OF TECHNOLOGY MAY 22, 2020
+Startup Posh has created chat bots that use “conversational memory” to have more natural exchanges.
+
+The comedian Bill Burr has said he refuses to call into automated customer service lines for fear that, years later on his death bed, all he’ll be able to think about are the moments he wasted dealing with chatbots.

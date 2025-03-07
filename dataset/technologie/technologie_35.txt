@@ -1,0 +1,7 @@
+Virtual cybersecurity school teaches kids to fix security flaws and hunt down hackers
+
+When Christopher Boddy was 14 years old, he'd log onto his computer after school to spend hours playing a game that taught him the basics of digital forensics, ethical hacking and cryptography.
+
+It may not have been a typical after-school activity, but it was just what the UK government hoped for when it launched its Cyber Discovery program three years ago: It inspired Boddy, now 17, to consider a career in cybersecurity.
+"I originally learned about it in school, but then I'd get stuck on problems that I needed to find the answer to," said Boddy, who lives outside London with his parents. "I'd stay up way later than I should have and postponed homework to get a challenge done."
+What started as a school-based program to teach kids a new skill is extending into a virtual cyber school. It's filled with lessons and games to teach users how to fix security flaws on webpages, uncover trails left by cybercriminals and decrypt codes used by hackers. The program is now available online for any student ages 13 - 18 for free in the UK, and $150 a year in the US.

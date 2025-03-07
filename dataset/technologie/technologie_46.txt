@@ -1,0 +1,11 @@
+New World’s Record for Fastest Internet Speed From a Single Optical Chip: 44.2 Tbps
+Researchers from Monash, Swinburne and RMIT universities have successfully tested and recorded Australia’s fastest internet data speed, and that of the world, from a single optical chip — capable of downloading 1000 high definition movies in a split second.
+
+Published in the prestigious journal Nature Communications, these findings have the potential to not only fast-track the next 25 years of Australia’s telecommunications capacity, but also the possibility for this home-grown technology to be rolled out across the world.
+This technology has the capacity to support the high-speed internet connections of 1.8 million households in Melbourne, Australia, at the same time, and billions across the world during peak periods.
+They used a new device that replaces 80 lasers with one single piece of equipment known as a micro-comb, which is smaller and lighter than existing telecommunications hardware. It was planted into and load-tested using existing infrastructure, which mirrors that used by the NBN.
+
+It is the first time any micro-comb has been used in a field trial and possesses the highest amount of data produced from a single optical chip.
+“We’re currently getting a sneak-peak of how the infrastructure for the internet will hold up in two to three years’ time, due to the unprecedented number of people using the internet for remote work, socializing and streaming. It’s really showing us that we need to be able to scale the capacity of our internet connections,” said Dr Bill Corcoran, co-lead author of the study and Lecturer in Electrical and Computer Systems Engineering at Monash University.
+
+“What our research demonstrates is the ability for fibers that we already have in the ground, thanks to the NBN project, to be the backbone of communications networks now and in the future. We’ve developed something that is scalable to meet future needs.

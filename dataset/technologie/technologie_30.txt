@@ -1,0 +1,3 @@
+What's in the latest Chrome update? Whole lot of security, privacy shakin' goin' on
+After skipping version 82 because of the pandemic, Google this week released Chrome 83, which offers users DNS-over-HTTPS and – eventually – tab grouping.
+Google this week released Chrome 83, picking up after skipping a version because of the COVID-19 pandemic, auto-upgrading eligible users to DNS-over-HTTPS (DoH) and enabling tab groups for everyone.

@@ -1,0 +1,18 @@
+How to Create Images with Transparent Background for Your Website
+Published in Graphic design
+Is your excellent picture for your blog post ruined by a terrible background? Do you need to save a photo with a plain background for your e-commerce store or new blog? There are several reasons why you may want to make an image background transparent.
+
+But just in case you are wondering how to make the background of a picture transparent, all hope is not lost yet. Below we will describe three methods using various photo editing software like Photoshop, PhotoWorks and Paint that you can use to get rid of an unwanted background for a picture for your website. 
+
+Method 1. Using Photoshop
+Photoshop is one of the leading photo editing software you can use to create an image with transparent background. It’s no surprise that it is on this list, a vast number of photo editors use it across the globe.
+
+Here are a few steps you need to follow to use Photoshop to remove the background of an image.
+
+Step 1. Choose Quick selection from the list of tools on the toolbar.
+
+Step 2. Choose the part of the image you want to retain. Photoshop will automatically help you isolate it from the background.
+
+Step 3. If the automatic selection isn’t as accurate as you like, you can use the Subtract from selection option to retouch the edges.
+
+Step 4. Now you can inverse the selection by right-clicking and choosing Select inverse. The background image of the picture should now be transparent.

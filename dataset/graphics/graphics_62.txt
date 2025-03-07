@@ -1,0 +1,9 @@
+Keeping your image close to natural looking is the best thing to do but if you want to manipulate your image and make with your imagination then you should only care for the lighting and shadow. Because in the image manipulation technique you can manipulate almost everything around the subject without the lighting and shadow. Yes, you can edit them also but won’t get the jaw-dropping result if you overdo it.
+
+Use Presets
+The editing tips I have given above are the basic thing you should do when you go to post-process your image. Now let’s talk about overall editing and applying different filters. After you complete those basic editing tries to use presets or actions to edit your image. What is preset? Or what are photoshop actions?
+
+Well, these are a combination of image editing that is saved and you can use them on a similar kind of image to get similar output but faster than before. How to use presets? It’s easy to just insert your image and do some basic touch up and then got to the preset menu and selects the saved preset in your computer and hit apply. Your image will get a similar filter that the preset holds. By using presets and actions you can achieve faster workflow like never before.
+
+Use Batch-Editing
+Sometimes you have lots of images that need similar kinds of editing. Editing then one by one is a time-wasting job for sure. In Lightroom, you can do batch editing. Basically, it is a process by which editors use a preset and select all the images and make a batch of them that they want to edit. Then they apply the preset to that batch and all of the images in that batch get the same editing in a matter of time. It is a huge time saver especially when you are short of it the most.

@@ -1,0 +1,17 @@
+Benefits of Approval Studio Proofing Tool for Designers and Creative Teams
+Published in Graphic design, Software, Tools
+Among all of the design agencies’ headaches, artwork proofing is probably one of the most acute ones. Forwarding countless numbers of requests, following up your approvers with reminders that they have a file to check, searching for their feedback in the endless pile of emails or messages… Quite daunting, to say the least, and quite expensive too – the amounts of time and, as a result, money spent on this back-and-forth game are quite significant. However, there is a solution that would allow you to cut your turnaround time by up to 35% – a specialized proofing software.
+
+One of such programs is Approval Studio. It is a proofing tool developed specifically to help designers and creative teams spend less time on boring and repetitive processes and make the whole workflow more organized and efficient. There are quite a few features with which Approval Studio helps you to streamline proofing of visual assets, so let’s create a project, upload some file, and see what we can do with it.
+
+№1: Sharing files
+After the upload, users can start sharing their artwork with other reviewers. There are two types of reviewers: internal – they can access your dashboard or even get tasks assigned to them in Approval’s Pro version – and external ones. Let’s concentrate on the latter.
+A big blue “Share” button in the upper right corner is the starting point of your cooperation with the clients. You can send the invitation to Approval Studio to their email or share a short link via your messenger chat – with a password or making the file read-only if you like. Your reviewer will be able to see the same thing you see and add annotations. 
+
+№2: Online review tool
+Approval Studio offers advanced annotation possibilities that include a set of different shapes, namely a point, a circle, a square, and a free-form (if you need to draw something by hand). Users can pick a color for each annotation, which is helpful when there are several reviewers. Also, there is a possibility to bind one annotation to several places in the artwork if there is the same repeated mistake or if you need to apply similar changes, let’s say, to the fonts or colors. Annotations will appear on the mockup itself and on the comments panel to the right.
+If you need to check the artwork from another angle or annotate a much smaller detail, it is not a problem at all. Approval Studio allows rotating the image as much as you like and zooms it without descaling or quality loss so that you can read even the tiniest text.
+
+The main thing is that the system is totally live – whenever they add a comment, you will see it instantly on your screen with no need to refresh the page. It works like a built-in messenger to make your review sessions more convenient.
+
+After the discussion is over, the last thing that’s left is approving or rejecting the file. At this stage, it’s important to be careful, because you will not be able to add any new annotations to this version after you confirm your verdict.

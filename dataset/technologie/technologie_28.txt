@@ -1,0 +1,12 @@
+In brief: Microsoft's Fluid Framework documents explained
+At Build 2020, Microsoft opened up its Fluid Framework as a user preview for Microsoft 365 Enterprise and education subscribers enrolled in Targeted Release. Here's a look at the concept, what documents it supports and how it could be a boon to productivity.
+
+With users now able to get their hands on Microsoft's latest document format — rolled out under the umbrella of the Fluid Framework — the company is hoping it can deliver on its promises of better productivity and collaboration online.
+
+The Fluid Framework was announced at Microsoft's Build developer conference in 2019, and at Build 2020 — a virtual-only event this year — the company made the format available for user preview for Microsoft 365 Enterprise and education subscribers enrolled in Targeted Release. It's also available as open source software; Microsoft said the code and SDK will be available on GitHub soon.
+
+The goal behind Fluid is an ambitious one: users can create discrete pieces of content — such as text, tables, graphs or lists — that live on the web instead of the desktop or a SharePoint drive and are browser agnostic. These artifacts can then be collaborated on or snapped together with other elements in near-to-real-time across a variety of environments.
+
+Nick McQuire, vice president for network enterprise research at CCS Insight, believes Microsoft is on its way to making Office "a development environment," where organizations can start to "embed [Fluid] in business processes and deeper collaboration environments across your company.
+
+" Microsoft does feel a bit of pressure to break down the silos within various, different applications out there, as well," he said. "Whether it is Google or other flavors of collaboration software, there are others that are pushing the boundaries of what it is to collaborate."

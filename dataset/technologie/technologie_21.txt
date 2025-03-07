@@ -1,0 +1,4 @@
+Google and Apple release contact tracing app API
+
+Google and Apple delivered their contact tracing app API to public health agencies across the globe. The apps would allow Bluetooth pings between smartphones within six and a half feet of each other. And in theory, these apps would notify you if you had been in close contact with someone diagnosed with COVID-19. In practice, public health authorities will have to encourage around 60% people in a given state or country to download the app in order to meaningfully conduct contact tracing/exposure notification.
+Computerworld executive editor Ken Mingis and PCWorld/Macworld’s Michael Simon join Juliet to discuss Apple and Google’s unprecedented collaboration, privacy concerns and how state and federal governments will utilize the API. 

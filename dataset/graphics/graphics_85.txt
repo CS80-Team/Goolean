@@ -1,0 +1,37 @@
+What is Graphic Design?
+Graphic design is the craft of creating visual content to communicate messages. Applying visual hierarchy and page layout techniques, graphic designers use typography and pictures to meet users’ specific needs and focus on the logic of displaying elements in interactive designs to optimize the user experience.
+
+
+Learn the fundamentals of Graphic Design with this video from GCFLearnFree.
+
+Graphic Design – Molding Users’ Experience Visually
+Graphic design is an ancient craft, dating back past Egyptian hieroglyphs to 17,000-year-old cave paintings. As a term originating in the 1920s’ print industry and covering a range of activities including logo creation, it concerns aesthetic appeal and marketing – attracting viewers using images, color and typography. However, graphic designers working in user experience (UX) design must justify stylistic choices regarding, say, image locations and font with a human-centered approach, focusing on—and seeking maximum empathy with—users while creating good-looking designs that maximize usability. Aesthetics must serve a purpose – in UX design we don’t create art for art’s sake. So, when doing graphic design for UX, you should consider the information architecture of your interactive designs, to ensure accessibility for users, and leverage graphic design skills in creating output that considers the entire user experience, including users’ visual processing abilities. For instance, if an otherwise pleasing mobile app can’t offer users what they need in several thumb-clicks, its designers will have failed to marry graphic design to user experience. The scope of graphic design in UX covers creating beautiful designs that users find highly pleasurable, meaningful, and usable.
+
+“Design is a solution to a problem. Art is a question to a problem.”
+
+— John Maeda, President of Rhode Island School of Design
+
+
+Author/Copyright holder: Teo Yu Siang and Interaction Design Foundation. Copyright terms and licence: CC BY-NC-SA 3.0
+Graphic Design is Emotional Design
+Although the digital age entails designing with interactive software, graphic design still revolves around age-old principles. Striking the right chord with users from the first glance is crucial. As a graphic designer, you should have a firm understanding of color theory and how vital the right choice of color scheme is. Color choices must reflect not only the organization (e.g., blue suits banking) but also users’ expectations (e.g., red for alerts; green for notifications to proceed). You should design with an eye for how elements match the tone (e.g., sans-serif fonts for excitement/happiness) and overall effect, noting how you shape users’ emotions as you guide them from, say, a landing page to a call to action. Often, graphic designers are involved in motion design for smaller screens, carefully monitoring how the work’s aesthetics match users’ expectations and enhance usability in a flowing, seamless experience by anticipating their needs and mindsets. With user psychology in mind some especially weighty graphic design considerations are:
+
+Symmetry and Balance (including symmetry types)
+Flow
+Repetition
+Pattern
+The Golden Ratio (i.e., proportions of 1:1.618)
+The Rule of Thirds (i.e., how users’ eyes recognize good layout)
+Typography (encompassing everything from font choice to heading weight)
+Audience Culture (re Color Use and Reading Pattern)
+
+Author/Copyright holder: Teo Yu Siang and Interaction Design Foundation. Copyright terms and licence: CC BY-NC-SA 3.0
+Overall, the mission vis-à-vis graphic design is displaying information harmoniously – beauty and usability must go hand in hand, discreetly carrying your organization’s ideals. Through a trustworthy visual presence, you hint to users that you know what they want to do – not just because you’ve arranged aesthetically pleasing elements that are where they expect to find them, or help them intuit their way around, but because the values your designs display mirror theirs, too.
+
+Learn More about Graphic Design
+The IDF’s encyclopedia addresses Graphic Design’s place in UX: https://www.interaction-design.org/literature/book/the-encyclopedia-of-human-computer-interaction-2nd-ed/visual-representation
+
+A first-hand account on transitioning from Graphic Design to UX Design: https://uxdesign.cc/3-things-i-wish-i-knew-before-i-made-the-shift-from-graphic-design-to-ux-design-655af468c923
+
+An incisive piece examining similarities/differences between Graphic and UX Design: https://theblog.adobe.com/ux-design-for-graphic-designers/
+
