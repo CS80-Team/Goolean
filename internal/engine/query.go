@@ -163,13 +163,18 @@ func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structure
 	}
 	var res = structures.NewSortedSlice[int]()
 
-	if s1.GetLength() > s2.GetLength() {
-		return e.intersection(s2, s1)
-	}
+	i := 0
+	j := 0
 
-	for i := 0; i < s1.GetLength(); i++ {
-		if idx := s2.BinarySearch(s1.At(i)); idx != -1 {
+	for i < s1.GetLength() && j < s2.GetLength() {
+		if s1.At(i) == s2.At(j) {
 			res.InsertSorted(s1.At(i))
+			i++
+			j++
+		} else if s1.At(i) < s2.At(j) {
+			i++
+		} else {
+			j++
 		}
 	}
 
