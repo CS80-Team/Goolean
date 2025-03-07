@@ -119,6 +119,9 @@ func (e *Engine) QueryString(query string) structures.OrderedStructure[int] {
 func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedStructure[int] {
 	var res = structures.NewSortedSlice[int]()
 	if s == nil {
+		for i := 0; i < e.GetDocumentsSize(); i++ {
+			res.InsertSorted(i)
+		}
 		return res
 	}
 
@@ -132,6 +135,9 @@ func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedS
 }
 
 func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structures.OrderedStructure[int] {
+	if s1 == nil || s2 == nil {
+		return nil
+	}
 	var res = structures.NewSortedSlice[int]()
 
 	if s1.GetLength() > s2.GetLength() {
@@ -148,6 +154,13 @@ func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structure
 }
 
 func (e *Engine) union(s1, s2 structures.OrderedStructure[int]) structures.OrderedStructure[int] {
+	if s1 == nil {
+		return s2
+	}
+	if s2 == nil {
+		return s1
+	}
+
 	var res = structures.NewSortedSlice[int]()
 
 	for i := range s1.GetLength() {
