@@ -19,7 +19,11 @@ func (e *Engine) Query(tokens []string) structures.OrderedStructure[int] {
 	if len(tokens) == 0 {
 		return nil
 	} else if len(tokens) == 1 {
-		if tokens[0] == NOT || tokens[0] == AND || tokens[0] == OR {
+		// not world
+		if tokens[0] == NOT {
+			return res
+		}
+		if tokens[0] == AND || tokens[0] == OR {
 			panic("[Engine]: Invalid query, missing operand")
 		}
 		tokenized := e.ProcessToken(tokens[0])
@@ -106,6 +110,15 @@ func (e *Engine) Query(tokens []string) structures.OrderedStructure[int] {
 					res = e.inverse(res)
 				}
 			}
+		}
+	}
+
+	if !ops.IsEmpty() && ops.Peek() == NOT {
+		ops.Pop()
+		if res == nil {
+			res = e.inverse(nil)
+		} else {
+			res = e.inverse(res)
 		}
 	}
 
