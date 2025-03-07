@@ -138,8 +138,11 @@ func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedS
 		return res
 	}
 
-	for i := 0; i < e.GetDocumentsSize(); i++ {
-		if idx := s.BinarySearch(i); idx == -1 {
+	j := 0
+	for i := 0; i < e.GetDocumentsSize() && j < s.GetLength(); i++ {
+		if i == s.At(j) {
+			j++
+		} else {
 			res.InsertSorted(i)
 		}
 	}
