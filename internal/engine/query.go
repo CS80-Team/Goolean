@@ -164,7 +164,7 @@ func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structure
 	var res = structures.NewSortedSlice[int]()
 
 	if s1.GetLength() > s2.GetLength() {
-		s1, s2 = s2, s1
+		return e.intersection(s2, s1)
 	}
 
 	for i := 0; i < s1.GetLength(); i++ {
