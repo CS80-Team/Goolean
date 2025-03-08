@@ -3,8 +3,6 @@ package shell
 import (
 	"io"
 	"os"
-	"os/exec"
-	"runtime"
 	"strings"
 )
 
@@ -25,55 +23,11 @@ type Shell struct {
 }
 
 func NewShell() *Shell {
-	sh := &Shell{
+	return &Shell{
 		commands:  make(map[string]Command),
 		inStream:  os.Stdin,
 		outStream: os.Stdout,
 	}
-
-	sh.RegisterCommand(Command{
-		Name:        "exit",
-		Description: "Exit the shell",
-		Handler: func(args []string) Status {
-			return EXIT
-		},
-		Usage: "exit",
-	})
-
-	sh.RegisterCommand(Command{
-		Name:        "help",
-		Description: "List all available commands",
-		Handler: func(args []string) Status {
-			for _, cmd := range sh.GetCommands() {
-				sh.Write(cmd.Name + ": " + cmd.Description + "\n")
-				sh.Write("    Usage: " + cmd.Usage + "\n")
-			}
-			return OK
-		},
-		Usage: "help",
-	})
-
-	sh.RegisterCommand(Command{
-		Name:        "clear",
-		Description: "Clear the screen",
-		Handler: func(args []string) Status {
-			switch runtime.GOOS {
-			case "windows":
-				cmd := exec.Command("cmd", "/c", "cls")
-				cmd.Stdout = os.Stdout
-				_ = cmd.Run()
-			default:
-				cmd := exec.Command("clear")
-				cmd.Stdout = os.Stdout
-				_ = cmd.Run()
-			}
-
-			return OK
-		},
-		Usage: "clear",
-	})
-
-	return sh
 }
 
 func (s *Shell) RegisterCommand(cmd Command) {
@@ -86,7 +40,7 @@ func (s *Shell) RegisterEarlyExecCommand(cmd EarlyCommand) {
 
 func (s *Shell) executeEarlyCommands() {
 	for _, cmd := range s.earlyExecCommands {
-		cmd.Handler()
+		cmd.Handler(s)
 	}
 }
 
@@ -100,7 +54,7 @@ func (s *Shell) executeCommand(cmd string, args []string) Status {
 	}
 
 	if command, ok := s.commands[cmd]; ok {
-		return command.Handler(args)
+		return command.Handler(s, args)
 	}
 
 	return NotFound
