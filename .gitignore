@@ -4,3 +4,4 @@
 bin
 dataset
 go.sum
+test_dataset
