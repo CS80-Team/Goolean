@@ -1,9 +1,8 @@
-package commands
+package main
 
 import (
 	"Boolean-IR-System/internal/engine"
 	"Boolean-IR-System/shell"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -12,8 +11,6 @@ import (
 )
 
 func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
-	registerBuiltInCommands(s)
-
 	s.RegisterCommand(shell.Command{
 		Name:        "open",
 		Description: "Open a document by ID in the default editor",
@@ -47,50 +44,6 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 		Description: "Displays the total number of documents and keys in the engine",
 		Handler:     engineStatsCommand(engine),
 		Usage:       "engine-stats",
-	})
-}
-
-func registerBuiltInCommands(sh *shell.Shell) {
-	sh.RegisterCommand(shell.Command{
-		Name:        "exit",
-		Description: "Exit the shell",
-		Handler: func(s *shell.Shell, args []string) shell.Status {
-			return shell.EXIT
-		},
-		Usage: "exit",
-	})
-
-	sh.RegisterCommand(shell.Command{
-		Name:        "help",
-		Description: "List all available commands",
-		Handler: func(s *shell.Shell, args []string) shell.Status {
-			for _, cmd := range sh.GetCommands() {
-				sh.Write(cmd.Name + ": " + cmd.Description + "\n")
-				sh.Write("    Usage: " + cmd.Usage + "\n")
-			}
-			return shell.OK
-		},
-		Usage: "help",
-	})
-
-	sh.RegisterCommand(shell.Command{
-		Name:        "clear",
-		Description: "Clear the screen",
-		Handler: func(s *shell.Shell, args []string) shell.Status {
-			switch runtime.GOOS {
-			case "windows":
-				cmd := exec.Command("cmd", "/c", "cls")
-				cmd.Stdout = os.Stdout
-				_ = cmd.Run()
-			default:
-				cmd := exec.Command("clear")
-				cmd.Stdout = os.Stdout
-				_ = cmd.Run()
-			}
-
-			return shell.OK
-		},
-		Usage: "clear",
 	})
 }
 
@@ -158,91 +111,71 @@ func queryCommand(engine *engine.Engine) func(s *shell.Shell, args []string) she
 
 func listCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
 	return func(s *shell.Shell, args []string) shell.Status {
-		var stat = shell.OK
+		var validArgs = []string{"-name", "-path", "-id", "-n"}
+		var displayFields []string
+		var seen = make(map[string]bool)
+		var limit = -1
 
-		if len(args) == 0 {
-			for i := 0; i < len(engine.GetDocuments()); i++ {
-				doc := engine.GetDocumentByID(i)
-				s.Write(strconv.Itoa(doc.ID) + " " + doc.Name + " " + doc.Path + "\n")
+		for i := 0; i < len(args); i++ {
+			arg := args[i]
+			if !slices.Contains(validArgs, arg) {
+				s.Write("Invalid argument: " + arg + "\n")
+				return shell.FAIL
 			}
-			stat = shell.OK
-		} else {
 
-			var validArgs = []string{"-name", "-path", "-id", "-n"}
-			var displayFields []string
-			var seen = make(map[string]bool)
-			var limit = -1
+			if seen[arg] {
+				s.Write("Duplicate argument: " + arg + "\n")
+				return shell.FAIL
+			}
 
-			for i := 0; i < len(args); i++ {
-				arg := args[i]
-				if !slices.Contains(validArgs, arg) {
-					s.Write("Invalid argument: " + arg + "\n")
-					stat = shell.FAIL
-					break
+			seen[arg] = true
+
+			if arg == "-n" {
+				if i+1 >= len(args) {
+					s.Write("Missing value for -n\n")
+					return shell.FAIL
 				}
 
-				if seen[arg] {
-					s.Write("Duplicate argument: " + arg + "\n")
-					stat = shell.FAIL
-					break
+				n, err := strconv.Atoi(args[i+1])
+				if err != nil || n < 1 {
+					s.Write("Invalid value for -n. Must be a positive integer.\n")
+					return shell.FAIL
 				}
 
-				seen[arg] = true
-
-				if arg == "-n" {
-					if i+1 >= len(args) {
-						s.Write("Missing value for -n\n")
-						return shell.FAIL
-					}
-
-					n, err := strconv.Atoi(args[i+1])
-					if err != nil || n < 1 {
-						s.Write("Invalid value for -n. Must be a positive integer.\n")
-						return shell.FAIL
-					}
-
-					limit = n
-					i++
-				} else {
-					displayFields = append(displayFields, arg)
-				}
-			}
-
-			if stat == shell.FAIL {
-				goto end
-			}
-
-			if len(displayFields) == 0 {
-				displayFields = []string{"-id", "-name", "-path"}
-			}
-
-			totalDocs := len(engine.GetDocuments())
-			if limit == -1 || limit > totalDocs {
-				limit = totalDocs
-			}
-
-			for i := 0; i < limit; i++ {
-				doc := engine.GetDocumentByID(i)
-				for _, field := range displayFields {
-					switch field {
-					case "-name":
-						s.Write(doc.Name)
-					case "-path":
-						s.Write(doc.Path)
-					case "-id":
-						s.Write(strconv.Itoa(doc.ID))
-					}
-					s.Write(" ")
-				}
-				s.Write("\n")
+				limit = n
+				i++
+			} else {
+				displayFields = append(displayFields, arg)
 			}
 		}
 
-	end:
-		if stat == shell.OK {
-			s.Write("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
+		if len(displayFields) == 0 {
+			displayFields = []string{"-id", "-name", "-path"}
 		}
-		return stat
+
+		totalDocs := len(engine.GetDocuments())
+		if limit == -1 || limit > totalDocs {
+			limit = totalDocs
+		}
+
+		for i := 0; i < limit; i++ {
+			doc := engine.GetDocumentByID(i)
+			for _, field := range displayFields {
+				switch field {
+				case "-name":
+					s.Write(doc.Name)
+				case "-path":
+					s.Write(doc.Path)
+				case "-id":
+					s.Write(strconv.Itoa(doc.ID))
+				}
+				s.Write("  ")
+			}
+			s.Write("\n")
+		}
+
+		s.Write("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
+		return shell.OK
 	}
 }
 

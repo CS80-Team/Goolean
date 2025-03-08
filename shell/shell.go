@@ -3,6 +3,8 @@ package shell
 import (
 	"io"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -22,12 +24,60 @@ type Shell struct {
 	outStream         io.Writer
 }
 
-func NewShell() *Shell {
-	return &Shell{
+func NewShell(istream io.Reader, ostream io.Writer) *Shell {
+	sh := &Shell{
 		commands:  make(map[string]Command),
-		inStream:  os.Stdin,
-		outStream: os.Stdout,
+		inStream:  istream,
+		outStream: ostream,
 	}
+
+	sh.registerBuiltInCommands()
+
+	return sh
+}
+
+func (sh *Shell) registerBuiltInCommands() {
+	sh.RegisterCommand(Command{
+		Name:        "exit",
+		Description: "Exit the shell",
+		Handler: func(s *Shell, args []string) Status {
+			return EXIT
+		},
+		Usage: "exit",
+	})
+
+	sh.RegisterCommand(Command{
+		Name:        "help",
+		Description: "List all available commands",
+		Handler: func(s *Shell, args []string) Status {
+			for _, cmd := range sh.GetCommands() {
+				sh.Write(cmd.Name + ": " + cmd.Description + "\n")
+				sh.Write("    Usage: " + cmd.Usage + "\n")
+			}
+			return OK
+		},
+		Usage: "help",
+	})
+
+	sh.RegisterCommand(Command{
+		Name:        "clear",
+		Description: "Clear the screen",
+		Handler: func(s *Shell, args []string) Status {
+			switch runtime.GOOS {
+			case "windows":
+				cmd := exec.Command("cmd", "/c", "cls")
+				cmd.Stdout = os.Stdout
+				_ = cmd.Run()
+			default:
+				cmd := exec.Command("clear")
+				cmd.Stdout = os.Stdout
+				_ = cmd.Run()
+			}
+
+			return OK
+		},
+		Usage: "clear",
+	})
 }
 
 func (s *Shell) RegisterCommand(cmd Command) {
