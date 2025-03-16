@@ -6,7 +6,7 @@ type Stack[Entry any] struct {
 }
 
 func NewStack[Entry any]() *Stack[Entry] {
-	return &Stack[Entry]{data: make([]Entry, 0), idx: -1}
+	return &Stack[Entry]{data: make([]Entry, 10), idx: -1}
 }
 
 func NewStackWithCapacity[Entry any](capacity int) *Stack[Entry] {
