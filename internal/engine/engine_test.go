@@ -27,7 +27,7 @@ var (
 		';':  {},
 	}
 
-	tokener = tokenizer.NewTokener(
+	delimiterManager = tokenizer.NewDelimiterManager(
 		&tokens,
 	)
 
@@ -136,7 +136,7 @@ func TestUnion(t *testing.T) {
 }
 
 func MockEngine() *Engine {
-	e := NewEngine(processor, tokenizer.NewTokener(&tokens))
+	e := NewEngine(processor, tokenizer.NewDelimiterManager(&tokens))
 
 	e.docs = []*internal.Document{
 		{ID: 0, Name: "ahmedAndOmar.txt"},

@@ -17,7 +17,7 @@ func main() {
 			textprocessing.NewStemmer(),
 			textprocessing.NewStopWordRemover(),
 		),
-		tokenizer.NewTokener(
+		tokenizer.NewDelimiterManager(
 			&map[rune]struct{}{
 				' ': {},
 

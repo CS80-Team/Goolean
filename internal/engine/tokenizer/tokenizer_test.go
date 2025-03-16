@@ -43,7 +43,7 @@ func TestTokenization(t *testing.T) {
 		}
 
 		for _, tc := range testcases {
-			tokenizer := NewTokenizer(&tc.input, NewTokener(&tokens))
+			tokenizer := NewTokenizer(&tc.input, NewDelimiterManager(&tokens))
 			i := 0
 			for tokenizer.HasNext() {
 				assert.NotEqual(t, i, len(tc.expected), fmt.Sprintf("Expected number of tokens to match, got %d", i))
@@ -68,7 +68,7 @@ func TestTokenization(t *testing.T) {
 		}
 
 		for _, tc := range testcases {
-			tokenizer := NewTokenizer(&tc.input, NewTokener(&tokens))
+			tokenizer := NewTokenizer(&tc.input, NewDelimiterManager(&tokens))
 			i := 0
 			for tokenizer.HasNext() {
 				assert.NotEqual(t, i, len(tc.expected), fmt.Sprintf("Expected number of tokens to match, got %d", i))

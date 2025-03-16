@@ -14,7 +14,7 @@ import (
 /*
 * `parseDocument` reads the document and tokenizes it using the engine's tokener
 * then it processes the tokens using the engine's processor and indexes them.
-*/
+ */
 func (e *Engine) parseDocument(doc *internal.Document) {
 	if doc == nil {
 		panic("[Indexer]: Document cannot be nil")
@@ -35,7 +35,7 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 	scan := bufio.NewScanner(file)
 	for scan.Scan() {
 		var line = scan.Text()
-		var tokenizer = tokenizer.NewTokenizer(&line, e.tokener)
+		var tokenizer = tokenizer.NewTokenizer(&line, e.delimiterManager)
 		var token string
 
 		for tokenizer.HasNext() {

@@ -1,7 +1,7 @@
 package shell
 
 func editDistance(a, b string) int {
-    l1 := len(a)
+	l1 := len(a)
 	l2 := len(b)
 
 	dp := make([][]int, l1+1)

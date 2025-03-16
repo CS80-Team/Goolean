@@ -1,13 +1,13 @@
 package tokenizer
 
 type Tokenizer struct {
-	line    *string
-	idx     int
-	tokener *Tokener
+	line             *string
+	idx              int
+	delimiterManager *DelimiterManager
 }
 
-func NewTokenizer(line *string, tokener *Tokener) *Tokenizer {
-	return &Tokenizer{line: line, idx: 0, tokener: tokener}
+func NewTokenizer(line *string, tokener *DelimiterManager) *Tokenizer {
+	return &Tokenizer{line: line, idx: 0, delimiterManager: tokener}
 }
 
 func (t *Tokenizer) NextToken() string {
@@ -16,16 +16,16 @@ func (t *Tokenizer) NextToken() string {
 	}
 
 	var token string
-	for t.idx < len(*t.line) && t.tokener.IsDelimiter((*t.line)[t.idx]) {
+	for t.idx < len(*t.line) && t.delimiterManager.IsDelimiter((*t.line)[t.idx]) {
 		t.idx++
 	}
 
-	for t.idx < len(*t.line) && !t.tokener.IsDelimiter((*t.line)[t.idx]) {
+	for t.idx < len(*t.line) && !t.delimiterManager.IsDelimiter((*t.line)[t.idx]) {
 		token += string(rune((*t.line)[t.idx]))
 		t.idx++
 	}
 
-	for t.idx < len(*t.line) && t.tokener.IsDelimiter((*t.line)[t.idx]) {
+	for t.idx < len(*t.line) && t.delimiterManager.IsDelimiter((*t.line)[t.idx]) {
 		t.idx++
 	}
 

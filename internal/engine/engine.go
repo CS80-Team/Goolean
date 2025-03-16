@@ -25,17 +25,17 @@ type Engine struct {
 	// it removes stop words and apply stemming and normalization to the tokens.
 	processor textprocessing.Processor
 
-	// `tokener` defines how the engine should tokenize the documents.
-	tokener *tokenizer.Tokener
+	// `delimiterManager` defines how the engine should tokenize the documents.
+	delimiterManager *tokenizer.DelimiterManager
 }
 
-func NewEngine(processor textprocessing.Processor, tokener *tokenizer.Tokener) *Engine {
+func NewEngine(processor textprocessing.Processor, tokener *tokenizer.DelimiterManager) *Engine {
 	return &Engine{
-		docs:      make([]*internal.Document, 0),
-		index:     make(map[string]ordered.OrderedStructure[int]),
-		library:   make(map[string]struct{}),
-		processor: processor,
-		tokener:   tokener,
+		docs:             make([]*internal.Document, 0),
+		index:            make(map[string]ordered.OrderedStructure[int]),
+		library:          make(map[string]struct{}),
+		processor:        processor,
+		delimiterManager: tokener,
 	}
 }
 
