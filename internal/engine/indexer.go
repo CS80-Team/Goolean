@@ -11,6 +11,10 @@ import (
 	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
 )
 
+/*
+* `parseDocument` reads the document and tokenizes it using the engine's tokener
+* then it processes the tokens using the engine's processor and indexes them.
+*/
 func (e *Engine) parseDocument(doc *internal.Document) {
 	if doc == nil {
 		panic("[Indexer]: Document cannot be nil")

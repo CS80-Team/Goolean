@@ -9,11 +9,24 @@ import (
 )
 
 type Engine struct {
-	docs      []*internal.Document
-	index     map[string]ordered.OrderedStructure[int]
-	library   map[string]struct{}
+	// `docs` stores Document structs that are stored in the engine,
+	// they are sorted by the order they were added to the engine and assigned an ID which is their index in the slice,
+	// it is used to retrieve documents by their ID.
+	docs []*internal.Document
+
+	// `index` maps a tokens (keys) to an ordered list of document IDs that contain that token,
+	// the list stores the documents sotred by their ID's.
+	index map[string]ordered.OrderedStructure[int]
+
+	// `library` is a "set" that stores documents names to avoid adding the same document multiple times.
+	library map[string]struct{}
+
+	// `processor` is used to process the tokens before adding them to the index and before querying the index,
+	// it removes stop words and apply stemming and normalization to the tokens.
 	processor textprocessing.Processor
-	tokener   *tokenizer.Tokener
+
+	// `tokener` defines how the engine should tokenize the documents.
+	tokener *tokenizer.Tokener
 }
 
 func NewEngine(processor textprocessing.Processor, tokener *tokenizer.Tokener) *Engine {
