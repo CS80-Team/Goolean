@@ -11,10 +11,10 @@ import (
 type Status string
 
 const (
-	OK       Status = "OK"
-	FAIL     Status = "FAIL"
-	EXIT     Status = "EXIT"
-	NotFound Status = "NOT_FOUND"
+	OK        Status = "OK"
+	FAIL      Status = "FAIL"
+	EXIT      Status = "EXIT"
+	NOT_FOUND Status = "NOT_FOUND"
 )
 
 type Shell struct {
@@ -52,7 +52,7 @@ func (sh *Shell) registerBuiltInCommands() {
 		Handler: func(s *Shell, args []string) Status {
 			for _, cmd := range sh.GetCommands() {
 				sh.Write(cmd.Name + ": " + cmd.Description + "\n")
-				sh.Write("    Usage: " + cmd.Usage + "\n")
+				sh.Write("    Usage: " + cmd.Usage + "\n\n")
 			}
 			return OK
 		},
@@ -107,7 +107,7 @@ func (s *Shell) executeCommand(cmd string, args []string) Status {
 		return command.Handler(s, args)
 	}
 
-	return NotFound
+	return NOT_FOUND
 }
 
 func (s *Shell) GetCommands() []Command {
@@ -154,7 +154,7 @@ func (s *Shell) Run(welcomeMessage string) {
 	for {
 		s.Write("\n")
 		s.executeEarlyCommands()
-		s.Write(">")
+		s.Write(">>> ")
 
 		input := s.read()
 		cmd, args := parseInput(input)
@@ -164,12 +164,38 @@ func (s *Shell) Run(welcomeMessage string) {
 			break
 		} else if stat == FAIL {
 			s.Write(s.commands[cmd].Usage + "\n")
-		} else if stat == NotFound {
-			s.Write("Command not found\n")
+		} else if stat == NOT_FOUND {
+			s.handleNotFound(cmd)
 		}
 	}
+}
 
-	s.Exit()
+func (s *Shell) handleNotFound(cmd string) {
+	nearestCmd := s.getNearestCommand(cmd)
+	if len(cmd) > 20 {
+		cmd = cmd[:20] + "..."
+	}
+
+	s.Write("Command (" + cmd + ") not found, ")
+
+	if nearestCmd != "" {
+		s.Write("did you mean `" + nearestCmd + "`?, ")
+
+	}
+	s.Write("type `help` for list of commands\n")
+}
+
+func (s *Shell) getNearestCommand(cmd string) string {
+	best := 2
+	nearestCmd := ""
+	for _, c := range s.commands {
+		dist := editDistance(c.Name, cmd)
+		if dist <= best {
+			best = dist
+			nearestCmd = c.Name
+		}
+	}
+	return nearestCmd
 }
 
 func parseInput(input string) (string, []string) {
@@ -179,8 +205,4 @@ func parseInput(input string) (string, []string) {
 	}
 
 	return tokens[0], tokens[1:]
-}
-
-func (s *Shell) Exit() {
-	os.Exit(0)
 }

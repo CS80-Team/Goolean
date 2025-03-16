@@ -6,7 +6,9 @@ import (
 	"runtime"
 	"slices"
 	"strconv"
+	"strings"
 
+	"github.com/CS80-Team/Boolean-IR-System/internal"
 	"github.com/CS80-Team/Boolean-IR-System/internal/engine"
 	"github.com/CS80-Team/Boolean-IR-System/shell"
 )
@@ -110,76 +112,6 @@ func queryCommand(engine *engine.Engine) func(s *shell.Shell, args []string) she
 	}
 }
 
-func listCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
-	return func(s *shell.Shell, args []string) shell.Status {
-		var validArgs = []string{"-name", "-path", "-id", "-n"}
-		var displayFields []string
-		var seen = make(map[string]bool)
-		var limit = -1
-
-		for i := 0; i < len(args); i++ {
-			arg := args[i]
-			if !slices.Contains(validArgs, arg) {
-				s.Write("Invalid argument: " + arg + "\n")
-				return shell.FAIL
-			}
-
-			if seen[arg] {
-				s.Write("Duplicate argument: " + arg + "\n")
-				return shell.FAIL
-			}
-
-			seen[arg] = true
-
-			if arg == "-n" {
-				if i+1 >= len(args) {
-					s.Write("Missing value for -n\n")
-					return shell.FAIL
-				}
-
-				n, err := strconv.Atoi(args[i+1])
-				if err != nil || n < 1 {
-					s.Write("Invalid value for -n. Must be a positive integer.\n")
-					return shell.FAIL
-				}
-
-				limit = n
-				i++
-			} else {
-				displayFields = append(displayFields, arg)
-			}
-		}
-
-		if len(displayFields) == 0 {
-			displayFields = []string{"-id", "-name", "-path"}
-		}
-
-		totalDocs := len(engine.GetDocuments())
-		if limit == -1 || limit > totalDocs {
-			limit = totalDocs
-		}
-
-		for i := 0; i < limit; i++ {
-			doc := engine.GetDocumentByID(i)
-			for _, field := range displayFields {
-				switch field {
-				case "-name":
-					s.Write(doc.Name)
-				case "-path":
-					s.Write(doc.Path)
-				case "-id":
-					s.Write(strconv.Itoa(doc.ID))
-				}
-				s.Write("  ")
-			}
-			s.Write("\n")
-		}
-
-		s.Write("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
-		return shell.OK
-	}
-}
-
 func loadCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
 	return func(s *shell.Shell, args []string) shell.Status {
 		if len(args) != 1 {
@@ -198,4 +130,114 @@ func engineStatsCommand(engine *engine.Engine) func(s *shell.Shell) {
 		s.Write("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
 		s.Write("Total keys: " + strconv.Itoa(engine.GetIndexSize()) + "\n")
 	}
+}
+
+func listCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
+	return func(s *shell.Shell, args []string) shell.Status {
+		displayFields, limit, sortby, err := parseListArgs(args)
+		if err != "" {
+			s.Write(err + "\n")
+			return shell.FAIL
+		}
+
+		docs := getSortedDocuments(engine, sortby)
+		if limit == -1 || limit > len(docs) {
+			limit = len(docs)
+		}
+
+		displayDocuments(s, docs, displayFields, limit, sortby)
+		return shell.OK
+	}
+}
+
+func parseListArgs(args []string) ([]string, int, string, string) {
+	var validArgs = []string{"-name", "-path", "-id", "-n", "-sortby"}
+	var displayFields []string
+	var seen = make(map[string]bool)
+	var limit = -1
+	var sortby = "id"
+
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if !slices.Contains(validArgs, arg) {
+			return nil, -1, "", "Invalid argument: " + arg
+		}
+
+		if seen[arg] {
+			return nil, -1, "", "Duplicate argument: " + arg
+		}
+
+		seen[arg] = true
+
+		if arg == "-n" {
+			if i+1 >= len(args) {
+				return nil, -1, "", "Missing value for -n"
+			}
+
+			n, err := strconv.Atoi((args)[i+1])
+			if err != nil || n < 1 {
+				return nil, -1, "", "Invalid value for -n. Must be a positive integer."
+			}
+
+			limit = n
+			i++
+		} else if arg == "-sortby" {
+			if i+1 >= len(args) {
+				return nil, -1, "", "Missing value for -sortby"
+			}
+
+			sortby = args[i+1]
+
+			if sortby != "name" && sortby != "path" && sortby != "id" {
+				return nil, -1, "", "Invalid value (" + sortby + ") for -sortby. Must be one of: name, path, id."
+			}
+
+			i++
+		} else {
+			displayFields = append(displayFields, arg)
+		}
+	}
+
+	if len(displayFields) == 0 {
+		displayFields = []string{"-id", "-name", "-path"}
+	}
+
+	return displayFields, limit, sortby, ""
+}
+
+func getSortedDocuments(engine *engine.Engine, sortby string) []*internal.Document {
+	if sortby == "id" {
+		return engine.GetDocuments()
+	}
+
+	docs := engine.GetDocumentsCopy()
+	if sortby == "name" {
+		slices.SortFunc(docs, func(i, j *internal.Document) int {
+			return strings.Compare(i.Name, j.Name)
+		})
+	} else if sortby == "path" {
+		slices.SortFunc(docs, func(i, j *internal.Document) int {
+			return strings.Compare(i.Path, j.Path)
+		})
+	}
+	return docs
+}
+
+func displayDocuments(s *shell.Shell, docs []*internal.Document, displayFields []string, limit int, sortby string) {
+	for i := 0; i < limit; i++ {
+		for _, field := range displayFields {
+			switch field {
+			case "-id":
+				s.Write(strconv.Itoa(docs[i].ID) + " ")
+			case "-name":
+				s.Write(docs[i].Name + " ")
+			case "-path":
+				s.Write(docs[i].Path + " ")
+			}
+		}
+		s.Write("\n")
+	}
+
+	s.Write("Total documents: " + strconv.Itoa(limit) + "\n")
+	s.Write("Sorted by: " + sortby + "\n")
 }

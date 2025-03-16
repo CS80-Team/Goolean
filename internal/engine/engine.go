@@ -56,6 +56,12 @@ func (e *Engine) GetDocuments() []*internal.Document {
 	return e.docs
 }
 
+func (e *Engine) GetDocumentsCopy() []*internal.Document {
+	docs := make([]*internal.Document, len(e.docs))
+	copy(docs, e.docs)
+	return docs
+}
+
 func (e *Engine) GetKeyIndex(key string) ordered.OrderedStructure[int] {
 	if _, ok := e.index[key]; !ok {
 		panic("[Engine]: Key index not found")

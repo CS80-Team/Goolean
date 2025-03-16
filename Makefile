@@ -7,8 +7,6 @@ ENTRY_PATH := .
 deps:
 	@echo "Installing dependencies..."
 	go mod tidy
-	go get github.com/stretchr/testify
-	go get github.com/joho/godotenv
 
 .PHONY: test
 test: deps
