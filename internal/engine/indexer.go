@@ -7,10 +7,15 @@ import (
 	"path/filepath"
 
 	"github.com/CS80-Team/Boolean-IR-System/internal"
+	"github.com/CS80-Team/Boolean-IR-System/internal/engine/tokenizer"
 	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
 )
 
 func (e *Engine) parseDocument(doc *internal.Document) {
+	if doc == nil {
+		panic("[Indexer]: Document cannot be nil")
+	}
+
 	filePath := filepath.Join(doc.Path, doc.Name)
 
 	file, err := os.Open(filePath)
@@ -26,43 +31,31 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 	scan := bufio.NewScanner(file)
 	for scan.Scan() {
 		var line = scan.Text()
-		var idx = 0
+		var tokenizer = tokenizer.NewTokenizer(&line, e.tokener)
 		var token string
-		for idx < len(line) {
-			token = getNextToken(&line, &idx)
+
+		for tokenizer.HasNext() {
+			token = tokenizer.NextToken()
 
 			token = e.ProcessToken(token)
-			if token == "" {
-				continue
-			}
 
-			if _, ok := e.index[token]; !ok {
-				e.index[token] = &ordered.OrderedSlice[int]{}
-			}
-
-			e.index[token].InsertSorted(doc.ID)
+			e.indexKey(&token, doc)
 		}
 	}
 }
 
-func getNextToken(line *string, idx *int) string {
-	var token string
-	for *idx < len(*line) && isDelimiter(rune((*line)[*idx])) {
-		*idx++
+func (e *Engine) indexKey(key *string, doc *internal.Document) {
+	if key == nil {
+		panic("[Indexer]: Key cannot be nil")
 	}
 
-	for *idx < len(*line) && !isDelimiter(rune((*line)[*idx])) {
-		token += string(rune((*line)[*idx]))
-		*idx++
+	if *key == "" {
+		return
 	}
 
-	for *idx < len(*line) && isDelimiter(rune((*line)[*idx])) {
-		*idx++
+	if _, ok := e.index[*key]; !ok {
+		e.index[*key] = &ordered.OrderedSlice[int]{}
 	}
 
-	return token
-}
-
-func isDelimiter(c rune) bool {
-	return c == ' ' || c == '\t' || c == '\n' || c == ',' || c == '.' || c == '!' || c == '?' || c == ':' || c == ';'
+	e.index[*key].InsertSorted(doc.ID)
 }

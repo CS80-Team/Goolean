@@ -21,7 +21,7 @@ run: deps
 	go run $(ENTRY_PATH)
 
 .PHONY: build
-build: clean deps fmt
+build: clean deps fmt test
 	@echo "Building the application..."
 	go build -o $(BIN_DIR)/$(APP_NAME) $(ENTRY_PATH)
 

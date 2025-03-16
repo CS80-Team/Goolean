@@ -4,6 +4,7 @@ import (
 	"github.com/CS80-Team/Boolean-IR-System/internal"
 	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
 
+	"github.com/CS80-Team/Boolean-IR-System/internal/engine/tokenizer"
 	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
 )
 
@@ -12,14 +13,16 @@ type Engine struct {
 	index     map[string]ordered.OrderedStructure[int]
 	library   map[string]struct{}
 	processor textprocessing.Processor
+	tokener   *tokenizer.Tokener
 }
 
-func NewEngine(processor textprocessing.Processor) *Engine {
+func NewEngine(processor textprocessing.Processor, tokener *tokenizer.Tokener) *Engine {
 	return &Engine{
 		docs:      make([]*internal.Document, 0),
 		index:     make(map[string]ordered.OrderedStructure[int]),
 		library:   make(map[string]struct{}),
 		processor: processor,
+		tokener:   tokener,
 	}
 }
 

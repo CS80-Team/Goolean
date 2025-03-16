@@ -8,11 +8,17 @@ type OrderedSlice[T constraints.Ordered] struct {
 	data []T
 }
 
-func NewSortedSlice[T constraints.Ordered](initialData ...T) *OrderedSlice[T] {
-	if len(initialData) > 0 {
-		return &OrderedSlice[T]{data: initialData}
+func NewSortedSlice[T constraints.Ordered]() *OrderedSlice[T] {
+	return &OrderedSlice[T]{}
+}
+
+func NewSortedSliceWithSlice[T constraints.Ordered](slice []T) *OrderedSlice[T] {
+	for i := 1; i < len(slice); i++ {
+		if slice[i] < slice[i-1] {
+			panic("Provided slice must be sorted")
+		}
 	}
-	return &OrderedSlice[T]{data: make([]T, 0)}
+	return &OrderedSlice[T]{data: slice}
 }
 
 func (s *OrderedSlice[T]) BinarySearch(val T) int {

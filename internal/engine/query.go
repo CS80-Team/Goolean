@@ -23,11 +23,12 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 	} else if len(tokens) == 1 {
 		// not world
 		if tokens[0] == NOT {
-			return res
+			return e.complement(nil)
 		}
 		if tokens[0] == AND || tokens[0] == OR {
 			panic("[Engine]: Invalid query, missing operand")
 		}
+
 		tokenized := e.ProcessToken(tokens[0])
 		return e.index[tokenized]
 	}
@@ -54,7 +55,7 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.intersection(e.inverse(e.index[keys.Pop()]), e.index[keys.Pop()])
+							res = e.intersection(e.complement(e.index[keys.Pop()]), e.index[keys.Pop()])
 						} else {
 							res = e.intersection(e.index[keys.Pop()], e.index[keys.Pop()])
 						}
@@ -64,7 +65,7 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.intersection(res, e.inverse(e.index[keys.Pop()]))
+							res = e.intersection(res, e.complement(e.index[keys.Pop()]))
 						} else {
 							res = e.intersection(res, e.index[keys.Pop()])
 						}
@@ -76,7 +77,7 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.union(e.inverse(e.index[keys.Pop()]), e.index[keys.Pop()])
+							res = e.union(e.complement(e.index[keys.Pop()]), e.index[keys.Pop()])
 						} else {
 							res = e.union(e.index[keys.Pop()], e.index[keys.Pop()])
 						}
@@ -86,7 +87,7 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.union(res, e.inverse(e.index[keys.Pop()]))
+							res = e.union(res, e.complement(e.index[keys.Pop()]))
 						} else {
 							res = e.union(res, e.index[keys.Pop()])
 						}
@@ -107,9 +108,9 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 
 			if notCount%2 == 1 {
 				if res == nil {
-					res = e.inverse(e.index[keys.Pop()])
+					res = e.complement(e.index[keys.Pop()])
 				} else {
-					res = e.inverse(res)
+					res = e.complement(res)
 				}
 			}
 		}
@@ -118,9 +119,9 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 	if !ops.IsEmpty() && ops.Peek() == NOT {
 		ops.Pop()
 		if res == nil {
-			res = e.inverse(nil)
+			res = e.complement(nil)
 		} else {
-			res = e.inverse(res)
+			res = e.complement(res)
 		}
 	}
 
@@ -131,7 +132,7 @@ func (e *Engine) QueryString(query string) ordered.OrderedStructure[int] {
 	return e.Query(strings.Fields(query))
 }
 
-func (e *Engine) inverse(s ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
+func (e *Engine) complement(s ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
 	var res = ordered.NewSortedSlice[int]()
 	if s == nil {
 		for i := 0; i < e.GetDocumentsSize(); i++ {
