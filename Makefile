@@ -1,4 +1,7 @@
 SHELL := /bin/bash
+APP_NAME := birs
+BIN_DIR := bin
+ENTRY_PATH := .
 
 .PHONY: deps
 deps:
@@ -15,14 +18,19 @@ test: deps
 .PHONY: run
 run: deps
 	@echo "Running the application..."
-	go run main.go
+	go run $(ENTRY_PATH)
 
 .PHONY: build
-build: deps test
+build: clean deps fmt
 	@echo "Building the application..."
-	go build -o bin/boolean-ir-system main.go
+	go build -o $(BIN_DIR)/$(APP_NAME) $(ENTRY_PATH)
 
-.PHONY: run
-run: deps test
-	@echo "Running the application..."
-	go run main.go
+.PHONY: clean
+clean:
+	@echo "Cleaning up..."
+	rm -rf $(BIN_DIR)
+
+.PHONY: fmt
+fmt:
+	@echo "Formatting code..."
+	gofmt -w .

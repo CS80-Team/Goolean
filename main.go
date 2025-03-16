@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/CS80-Team/Boolean-IR-System/internal/engine"
 	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
@@ -21,7 +22,7 @@ func main() {
 		textprocessing.NewStopWordRemover(),
 	))
 
-	engine.LoadDirectory(os.Getenv("DATASET_PATH"))
+	engine.LoadDirectory(filepath.Join(filepath.Base("."), "dataset"))
 
 	s := shell.NewShell(os.Stdin, os.Stdout)
 
