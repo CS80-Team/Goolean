@@ -1,10 +1,10 @@
 package engine
 
 import (
-	"Boolean-IR-System/internal"
 	"os"
 	"testing"
 
+	"github.com/CS80-Team/Boolean-IR-System/internal"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 )

@@ -1,4 +1,4 @@
-package structures
+package ordered
 
 import "golang.org/x/exp/constraints"
 

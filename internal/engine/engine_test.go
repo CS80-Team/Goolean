@@ -1,11 +1,11 @@
 package engine
 
 import (
-	"Boolean-IR-System/internal"
-	"Boolean-IR-System/internal/structures"
-	"Boolean-IR-System/internal/textprocessing"
 	"testing"
 
+	"github.com/CS80-Team/Boolean-IR-System/internal"
+	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
+	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,10 +25,10 @@ func MockEngine() *Engine {
 		{ID: 3, Name: "test.txt"},
 	}
 
-	e.index = map[string]structures.OrderedStructure[int]{
-		"ahmed": structures.NewSortedSlice(0, 1),
-		"omar":  structures.NewSortedSlice(0, 2),
-		"test":  structures.NewSortedSlice(3),
+	e.index = map[string]ordered.OrderedStructure[int]{
+		"ahmed": ordered.NewSortedSlice(0, 1),
+		"omar":  ordered.NewSortedSlice(0, 2),
+		"test":  ordered.NewSortedSlice(3),
 	}
 	return e
 }
@@ -111,17 +111,17 @@ func TestInverse(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		input    structures.OrderedStructure[int]
+		input    ordered.OrderedStructure[int]
 		expected []int
 	}{
 		{
 			name:     "Inverse of non-empty set",
-			input:    structures.NewSortedSlice[int](0, 1),
+			input:    ordered.NewSortedSlice[int](0, 1),
 			expected: []int{2, 3},
 		},
 		{
 			name:     "Inverse of empty set",
-			input:    structures.NewSortedSlice[int](),
+			input:    ordered.NewSortedSlice[int](),
 			expected: []int{0, 1, 2, 3},
 		},
 	}
@@ -142,20 +142,20 @@ func TestIntersection(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		s1       structures.OrderedStructure[int]
-		s2       structures.OrderedStructure[int]
+		s1       ordered.OrderedStructure[int]
+		s2       ordered.OrderedStructure[int]
 		expected []int
 	}{
 		{
 			name:     "Intersection of two sets",
-			s1:       structures.NewSortedSlice[int](0, 1),
-			s2:       structures.NewSortedSlice[int](0, 1, 2),
+			s1:       ordered.NewSortedSlice[int](0, 1),
+			s2:       ordered.NewSortedSlice[int](0, 1, 2),
 			expected: []int{0, 1},
 		},
 		{
 			name:     "Intersection with empty set",
-			s1:       structures.NewSortedSlice[int](0, 1),
-			s2:       structures.NewSortedSlice[int](),
+			s1:       ordered.NewSortedSlice[int](0, 1),
+			s2:       ordered.NewSortedSlice[int](),
 			expected: []int{},
 		},
 	}
@@ -176,20 +176,20 @@ func TestUnion(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		s1       structures.OrderedStructure[int]
-		s2       structures.OrderedStructure[int]
+		s1       ordered.OrderedStructure[int]
+		s2       ordered.OrderedStructure[int]
 		expected []int
 	}{
 		{
 			name:     "Union of two sets",
-			s1:       structures.NewSortedSlice[int](0, 1),
-			s2:       structures.NewSortedSlice[int](0, 2),
+			s1:       ordered.NewSortedSlice[int](0, 1),
+			s2:       ordered.NewSortedSlice[int](0, 2),
 			expected: []int{0, 1, 2},
 		},
 		{
 			name:     "Union with empty set",
-			s1:       structures.NewSortedSlice[int](0, 1),
-			s2:       structures.NewSortedSlice[int](),
+			s1:       ordered.NewSortedSlice[int](0, 1),
+			s2:       ordered.NewSortedSlice[int](),
 			expected: []int{0, 1},
 		},
 	}

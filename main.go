@@ -1,11 +1,11 @@
 package main
 
 import (
-	"Boolean-IR-System/internal/engine"
-	"Boolean-IR-System/internal/textprocessing"
-	"Boolean-IR-System/shell"
 	"os"
 
+	"github.com/CS80-Team/Boolean-IR-System/internal/engine"
+	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
+	"github.com/CS80-Team/Boolean-IR-System/shell"
 	"github.com/joho/godotenv"
 )
 

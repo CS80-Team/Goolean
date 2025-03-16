@@ -15,25 +15,26 @@ func TestStack(t *testing.T) {
 	})
 
 	t.Run("Test NewStack with custom size", func(t *testing.T) {
-		stack := NewStack[int](5)
+		stack := NewStackWithCapacity[int](5)
 		assert.Equal(t, 5, stack.GetCapacity(), "Expected capacity 5")
 	})
 
 	t.Run("Test NewStack with predefined slice", func(t *testing.T) {
-		stack := NewStack[int]([]int{1, 2, 3})
+		stack := NewStackWithSlice([]int{1, 2, 3})
 		assert.Equal(t, 3, stack.GetSize(), "Expected size 3")
 		assert.Equal(t, 3, stack.Peek(), "Expected top element 3")
 	})
 
 	t.Run("Test NewStack with Predefined slice takes a copy from the slice", func(t *testing.T) {
 		data := []int{1, 2, 3}
-		stack := NewStack[int](data)
+		stack := NewStackWithSlice(data)
 		data[2] = 100
 		assert.Equal(t, 3, stack.Peek(), "Expected top element 3")
 	})
 
-	t.Run("Test NewStack with invalid parameter", func(t *testing.T) {
-		require.Panics(t, func() { NewStack[int]("invalid") }, "Expected panic with invalid parameter")
+	t.Run("Test NewStack with empty slice", func(t *testing.T) {
+		stack := NewStackWithSlice([]int{})
+		assert.True(t, stack.IsEmpty(), "Expected stack to be empty")
 	})
 
 	t.Run("Test Push and Pop", func(t *testing.T) {

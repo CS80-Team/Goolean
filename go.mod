@@ -1,4 +1,4 @@
-module Boolean-IR-System
+module github.com/CS80-Team/Boolean-IR-System
 
 go 1.23.0
 

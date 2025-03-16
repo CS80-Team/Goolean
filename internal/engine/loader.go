@@ -1,11 +1,12 @@
 package engine
 
 import (
-	"Boolean-IR-System/internal"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/CS80-Team/Boolean-IR-System/internal"
 )
 
 func isLegible(ext string) bool {

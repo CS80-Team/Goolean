@@ -1,8 +1,10 @@
 package engine
 
 import (
-	"Boolean-IR-System/internal/structures"
 	"strings"
+
+	"github.com/CS80-Team/Boolean-IR-System/internal/structures"
+	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
 )
 
 const (
@@ -11,10 +13,10 @@ const (
 	NOT = "NOT"
 )
 
-func (e *Engine) Query(tokens []string) structures.OrderedStructure[int] {
+func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 	var ops = structures.NewStack[string]()
 	var keys = structures.NewStack[string]()
-	var res structures.OrderedStructure[int]
+	var res ordered.OrderedStructure[int]
 
 	if len(tokens) == 0 {
 		return nil
@@ -125,12 +127,12 @@ func (e *Engine) Query(tokens []string) structures.OrderedStructure[int] {
 	return res
 }
 
-func (e *Engine) QueryString(query string) structures.OrderedStructure[int] {
+func (e *Engine) QueryString(query string) ordered.OrderedStructure[int] {
 	return e.Query(strings.Fields(query))
 }
 
-func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedStructure[int] {
-	var res = structures.NewSortedSlice[int]()
+func (e *Engine) inverse(s ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
+	var res = ordered.NewSortedSlice[int]()
 	if s == nil {
 		for i := 0; i < e.GetDocumentsSize(); i++ {
 			res.InsertSorted(i)
@@ -157,11 +159,11 @@ func (e *Engine) inverse(s structures.OrderedStructure[int]) structures.OrderedS
 	return res
 }
 
-func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structures.OrderedStructure[int] {
+func (e *Engine) intersection(s1, s2 ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
 	if s1 == nil || s2 == nil {
 		return nil
 	}
-	var res = structures.NewSortedSlice[int]()
+	var res = ordered.NewSortedSlice[int]()
 
 	i := 0
 	j := 0
@@ -181,7 +183,7 @@ func (e *Engine) intersection(s1, s2 structures.OrderedStructure[int]) structure
 	return res
 }
 
-func (e *Engine) union(s1, s2 structures.OrderedStructure[int]) structures.OrderedStructure[int] {
+func (e *Engine) union(s1, s2 ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
 	if s1 == nil {
 		return s2
 	}
@@ -189,7 +191,7 @@ func (e *Engine) union(s1, s2 structures.OrderedStructure[int]) structures.Order
 		return s1
 	}
 
-	var res = structures.NewSortedSlice[int]()
+	var res = ordered.NewSortedSlice[int]()
 
 	for i := range s1.GetLength() {
 		res.InsertSorted(s1.At(i))

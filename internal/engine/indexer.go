@@ -1,12 +1,13 @@
 package engine
 
 import (
-	"Boolean-IR-System/internal"
-	"Boolean-IR-System/internal/structures"
 	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/CS80-Team/Boolean-IR-System/internal"
+	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
 )
 
 func (e *Engine) parseDocument(doc *internal.Document) {
@@ -36,7 +37,7 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 			}
 
 			if _, ok := e.index[token]; !ok {
-				e.index[token] = &structures.OrderedSlice[int]{}
+				e.index[token] = &ordered.OrderedSlice[int]{}
 			}
 
 			e.index[token].InsertSorted(doc.ID)

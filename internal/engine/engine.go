@@ -1,15 +1,15 @@
 package engine
 
 import (
-	"Boolean-IR-System/internal"
-	"Boolean-IR-System/internal/structures"
-	"Boolean-IR-System/internal/textprocessing"
-	// "path"
+	"github.com/CS80-Team/Boolean-IR-System/internal"
+	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
+
+	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
 )
 
 type Engine struct {
 	docs      []*internal.Document
-	index     map[string]structures.OrderedStructure[int]
+	index     map[string]ordered.OrderedStructure[int]
 	library   map[string]struct{}
 	processor textprocessing.Processor
 }
@@ -17,7 +17,7 @@ type Engine struct {
 func NewEngine(processor textprocessing.Processor) *Engine {
 	return &Engine{
 		docs:      make([]*internal.Document, 0),
-		index:     make(map[string]structures.OrderedStructure[int]),
+		index:     make(map[string]ordered.OrderedStructure[int]),
 		library:   make(map[string]struct{}),
 		processor: processor,
 	}
@@ -40,7 +40,7 @@ func (e *Engine) GetDocuments() []*internal.Document {
 	return e.docs
 }
 
-func (e *Engine) GetKeyIndex(key string) structures.OrderedStructure[int] {
+func (e *Engine) GetKeyIndex(key string) ordered.OrderedStructure[int] {
 	if _, ok := e.index[key]; !ok {
 		panic("[Engine]: Key index not found")
 	}

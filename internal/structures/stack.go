@@ -5,20 +5,18 @@ type Stack[Entry any] struct {
 	idx  int
 }
 
-func NewStack[Entry any](params ...interface{}) *Stack[Entry] {
-	if len(params) == 0 {
-		return &Stack[Entry]{data: make([]Entry, 10), idx: -1}
-	}
-	switch v := params[0].(type) {
-	case int:
-		return &Stack[Entry]{data: make([]Entry, v), idx: -1}
-	case []Entry:
-		var newData = make([]Entry, len(v))
-		copy(newData, v)
-		return &Stack[Entry]{data: newData, idx: len(v) - 1}
-	default:
-		panic("Invalid parameter type")
-	}
+func NewStack[Entry any]() *Stack[Entry] {
+	return &Stack[Entry]{data: make([]Entry, 0), idx: -1}
+}
+
+func NewStackWithCapacity[Entry any](capacity int) *Stack[Entry] {
+	return &Stack[Entry]{data: make([]Entry, capacity), idx: -1}
+}
+
+func NewStackWithSlice[Entry any](slice []Entry) *Stack[Entry] {
+	newS := make([]Entry, len(slice))
+	copy(newS, slice)
+	return &Stack[Entry]{data: newS, idx: len(slice) - 1}
 }
 
 func (s *Stack[Entry]) Push(val Entry) {

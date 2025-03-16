@@ -1,13 +1,14 @@
 package main
 
 import (
-	"Boolean-IR-System/internal/engine"
-	"Boolean-IR-System/shell"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"slices"
 	"strconv"
+
+	"github.com/CS80-Team/Boolean-IR-System/internal/engine"
+	"github.com/CS80-Team/Boolean-IR-System/shell"
 )
 
 func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
