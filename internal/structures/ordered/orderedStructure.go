@@ -9,4 +9,5 @@ type OrderedStructure[Entry constraints.Ordered] interface {
 	UpperBound(Entry) int
 	GetLength() int
 	At(int) Entry
+	IsEmpty() bool
 }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/CS80-Team/Boolean-IR-System/internal"
 	"github.com/CS80-Team/Boolean-IR-System/internal/engine/tokenizer"
-	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
 )
 
 /*
@@ -57,9 +56,5 @@ func (e *Engine) indexKey(key *string, doc *internal.Document) {
 		return
 	}
 
-	if _, ok := e.index[*key]; !ok {
-		e.index[*key] = &ordered.OrderedSlice[int]{}
-	}
-
-	e.index[*key].InsertSorted(doc.ID)
+	e.indexMgr.Put(*key, doc.ID)
 }

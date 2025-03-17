@@ -1,9 +1,10 @@
 package engine
 
 import (
+	"path/filepath"
 	"testing"
 
-	"github.com/CS80-Team/Boolean-IR-System/internal"
+	"github.com/CS80-Team/Boolean-IR-System/internal/engine/structuresFactory"
 	"github.com/CS80-Team/Boolean-IR-System/internal/engine/tokenizer"
 	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
 	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
@@ -31,9 +32,12 @@ var (
 		&tokens,
 	)
 
-	test  = processor.Process("test")
-	omar  = processor.Process("omar")
+	indexManager = NewIndexManager(structuresFactory.NewOrderedSliceFactory[int]())
+
 	ahmed = processor.Process("ahmed")
+	omar  = processor.Process("omar")
+
+	world = []int{0, 1, 2}
 )
 
 func TestComplement(t *testing.T) {
@@ -46,13 +50,13 @@ func TestComplement(t *testing.T) {
 	}{
 		{
 			name:     "Inverse of non-empty set",
-			input:    ordered.NewSortedSliceWithSlice([]int{0, 1}),
-			expected: []int{2, 3},
+			input:    e.indexMgr.factory.NewWithSlice([]int{0, 1}),
+			expected: []int{2},
 		},
 		{
 			name:     "Inverse of empty set",
-			input:    ordered.NewSortedSlice[int](),
-			expected: []int{0, 1, 2, 3},
+			input:    e.indexMgr.factory.New(),
+			expected: world,
 		},
 	}
 
@@ -78,14 +82,14 @@ func TestIntersection(t *testing.T) {
 	}{
 		{
 			name:     "Intersection of two sets",
-			s1:       ordered.NewSortedSliceWithSlice([]int{0, 1}),
-			s2:       ordered.NewSortedSliceWithSlice([]int{0, 1, 2}),
+			s1:       e.indexMgr.factory.NewWithSlice([]int{0, 1}),
+			s2:       e.indexMgr.factory.NewWithSlice(world),
 			expected: []int{0, 1},
 		},
 		{
 			name:     "Intersection with empty set",
-			s1:       ordered.NewSortedSliceWithSlice([]int{0, 1}),
-			s2:       ordered.NewSortedSlice[int](),
+			s1:       e.indexMgr.factory.NewWithSlice([]int{0, 1}),
+			s2:       ordered.NewOrderedSlice[int](),
 			expected: []int{},
 		},
 	}
@@ -112,14 +116,14 @@ func TestUnion(t *testing.T) {
 	}{
 		{
 			name:     "Union of two sets",
-			s1:       ordered.NewSortedSliceWithSlice([]int{0, 1}),
-			s2:       ordered.NewSortedSliceWithSlice([]int{0, 2}),
+			s1:       e.indexMgr.factory.NewWithSlice([]int{0, 1}),
+			s2:       e.indexMgr.factory.NewWithSlice([]int{0, 2}),
 			expected: []int{0, 1, 2},
 		},
 		{
 			name:     "Union with empty set",
-			s1:       ordered.NewSortedSliceWithSlice([]int{0, 1}),
-			s2:       ordered.NewSortedSlice[int](),
+			s1:       e.indexMgr.factory.NewWithSlice([]int{0, 1}),
+			s2:       e.indexMgr.factory.New(),
 			expected: []int{0, 1},
 		},
 	}
@@ -136,20 +140,10 @@ func TestUnion(t *testing.T) {
 }
 
 func MockEngine() *Engine {
-	e := NewEngine(processor, tokenizer.NewDelimiterManager(&tokens))
+	e := NewEngine(processor, delimiterManager, *indexManager)
 
-	e.docs = []*internal.Document{
-		{ID: 0, Name: "ahmedAndOmar.txt"},
-		{ID: 1, Name: "ahmed.txt"},
-		{ID: 2, Name: "omar.txt"},
-		{ID: 3, Name: "test.txt"},
-	}
+	e.LoadDirectory(filepath.Join("..", "..", "test_dataset", "engine_test_dataset"))
 
-	e.index = map[string]ordered.OrderedStructure[int]{
-		ahmed: ordered.NewSortedSliceWithSlice([]int{0, 1}),
-		omar:  ordered.NewSortedSliceWithSlice([]int{0, 2}),
-		test:  ordered.NewSortedSliceWithSlice([]int{3}),
-	}
 	return e
 }
 
@@ -169,22 +163,22 @@ func TestQuery(t *testing.T) {
 		{
 			name:     "AND operation",
 			query:    []string{ahmed, AND, omar},
-			expected: []int{0},
+			expected: []int{1},
 		},
 		{
 			name:     "OR operation",
 			query:    []string{ahmed, OR, omar},
-			expected: []int{0, 1, 2},
+			expected: world,
 		},
 		{
 			name:     "AND NOT operation",
 			query:    []string{ahmed, AND, NOT, omar},
-			expected: []int{1},
+			expected: []int{0},
 		},
 		{
 			name:     "Multiple NOT operations",
 			query:    []string{NOT, ahmed, AND, NOT, omar},
-			expected: []int{3},
+			expected: []int{},
 		},
 		{
 			name:     "Query with duplicate terms",
@@ -197,9 +191,27 @@ func TestQuery(t *testing.T) {
 			expected: nil,
 		},
 		{
-			name:     "Query engine world complement",
+			name:     "Query engine empty-set complement",
 			query:    []string{NOT},
-			expected: []int{0, 1, 2, 3},
+			expected: world,
+		},
+
+		// CASES TO be Handled
+
+		// {
+		// 	name:     "Query engine world complement",
+		// 	query:    []string{NOT, NOT},
+		// 	expected: nil,
+		// },
+		// {
+		// 	name:     "Query engine world intersection",
+		// 	query:    []string{NOT, AND, NOT},
+		// 	expected: world,
+		// },
+		{
+			name:     "Query engine world union",
+			query:    []string{NOT, OR, NOT},
+			expected: world,
 		},
 		{
 			name:     "Query a non existing key",
@@ -229,11 +241,11 @@ func TestQuery(t *testing.T) {
 		query []string
 	}{
 		{
-			name:  "Invalid query",
+			name:  "Invalid query (AND)",
 			query: []string{AND},
 		},
 		{
-			name:  "Invalid query",
+			name:  "Invalid query (OR)",
 			query: []string{OR},
 		},
 	}

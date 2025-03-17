@@ -8,7 +8,7 @@ import (
 
 func TestInsertion(t *testing.T) {
 	t.Run("Test Insertion from large to small", func(t *testing.T) {
-		s := NewSortedSlice[int]()
+		s := NewOrderedSlice[int]()
 		for i := 5; i > 0; i-- {
 			s.InsertSorted(i)
 		}
@@ -20,7 +20,7 @@ func TestInsertion(t *testing.T) {
 	})
 
 	t.Run("Test Insertion from small to large", func(t *testing.T) {
-		s := NewSortedSlice[int]()
+		s := NewOrderedSlice[int]()
 		for i := 0; i < 5; i++ {
 			s.InsertSorted(i)
 		}
@@ -32,7 +32,7 @@ func TestInsertion(t *testing.T) {
 	})
 
 	t.Run("Test Insertion with random order", func(t *testing.T) {
-		s := NewSortedSlice[int]()
+		s := NewOrderedSlice[int]()
 		s.InsertSorted(5)
 		s.InsertSorted(3)
 		s.InsertSorted(1)
@@ -50,7 +50,7 @@ func TestInsertion(t *testing.T) {
 	})
 
 	t.Run("Test inserting the minimum value", func(t *testing.T) {
-		s := NewSortedSlice[int]()
+		s := NewOrderedSlice[int]()
 
 		for i := 0; i < 1000; i++ {
 			s.InsertSorted(i)
@@ -65,7 +65,7 @@ func TestInsertion(t *testing.T) {
 	})
 
 	t.Run("Test inserting the maximum value", func(t *testing.T) {
-		s := NewSortedSlice[int]()
+		s := NewOrderedSlice[int]()
 
 		for i := 0; i < 1000; i++ {
 			s.InsertSorted(i)
@@ -80,7 +80,7 @@ func TestInsertion(t *testing.T) {
 	})
 
 	t.Run("Test Insertion with duplicates", func(t *testing.T) {
-		s := NewSortedSlice[int]()
+		s := NewOrderedSlice[int]()
 		s.InsertSorted(1)
 		s.InsertSorted(1)
 		s.InsertSorted(1000)
@@ -101,7 +101,7 @@ func TestInsertion(t *testing.T) {
 
 func TestSearching(t *testing.T) {
 	t.Run("Test BinarySearch", func(t *testing.T) {
-		s := NewSortedSlice[int]()
+		s := NewOrderedSlice[int]()
 		s.InsertSorted(1)
 		s.InsertSorted(2)
 		s.InsertSorted(3)

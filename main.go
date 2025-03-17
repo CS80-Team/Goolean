@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/CS80-Team/Boolean-IR-System/internal/engine/structuresFactory"
+
 	"github.com/CS80-Team/Boolean-IR-System/internal/engine"
 	"github.com/CS80-Team/Boolean-IR-System/internal/engine/tokenizer"
 	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
@@ -45,6 +47,7 @@ func main() {
 				'^': {},
 			},
 		),
+		*engine.NewIndexManager(structuresFactory.NewOrderedSliceFactory[int]()),
 	)
 
 	engine.LoadDirectory(filepath.Join(filepath.Base("."), "dataset"))

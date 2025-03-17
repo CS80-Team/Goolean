@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/CS80-Team/Boolean-IR-System/internal/structures"
@@ -30,8 +31,10 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 		}
 
 		tokenized := e.ProcessToken(tokens[0])
-		return e.index[tokenized]
+		return e.indexMgr.Get(tokenized)
 	}
+
+	// HANDLE NOT AND NOT
 
 	for _, token := range tokens {
 		if token == AND || token == OR || token == NOT {
@@ -55,9 +58,9 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.intersection(e.complement(e.index[keys.Pop()]), e.index[keys.Pop()])
+							res = e.intersection(e.complement(e.indexMgr.Get(keys.Pop())), e.indexMgr.Get(keys.Pop()))
 						} else {
-							res = e.intersection(e.index[keys.Pop()], e.index[keys.Pop()])
+							res = e.intersection(e.indexMgr.Get(keys.Pop()), e.indexMgr.Get(keys.Pop()))
 						}
 					} else {
 						if keys.IsEmpty() {
@@ -65,9 +68,9 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.intersection(res, e.complement(e.index[keys.Pop()]))
+							res = e.intersection(res, e.complement(e.indexMgr.Get(keys.Pop())))
 						} else {
-							res = e.intersection(res, e.index[keys.Pop()])
+							res = e.intersection(res, e.indexMgr.Get(keys.Pop()))
 						}
 					}
 				} else {
@@ -77,9 +80,9 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.union(e.complement(e.index[keys.Pop()]), e.index[keys.Pop()])
+							res = e.union(e.complement(e.indexMgr.Get(keys.Pop())), e.indexMgr.Get(keys.Pop()))
 						} else {
-							res = e.union(e.index[keys.Pop()], e.index[keys.Pop()])
+							res = e.union(e.indexMgr.Get(keys.Pop()), e.indexMgr.Get(keys.Pop()))
 						}
 					} else {
 						if keys.IsEmpty() {
@@ -87,9 +90,9 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 
 						if (notCount % 2) == 1 {
-							res = e.union(res, e.complement(e.index[keys.Pop()]))
+							res = e.union(res, e.complement(e.indexMgr.Get(keys.Pop())))
 						} else {
-							res = e.union(res, e.index[keys.Pop()])
+							res = e.union(res, e.indexMgr.Get(keys.Pop()))
 						}
 					}
 				}
@@ -108,7 +111,7 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 
 			if notCount%2 == 1 {
 				if res == nil {
-					res = e.complement(e.index[keys.Pop()])
+					res = e.complement(e.indexMgr.Get(keys.Pop()))
 				} else {
 					res = e.complement(res)
 				}
@@ -117,6 +120,7 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 	}
 
 	if !ops.IsEmpty() && ops.Peek() == NOT {
+		fmt.Println("Complement")
 		ops.Pop()
 		if res == nil {
 			res = e.complement(nil)
@@ -133,7 +137,7 @@ func (e *Engine) QueryString(query string) ordered.OrderedStructure[int] {
 }
 
 func (e *Engine) complement(s ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
-	var res = ordered.NewSortedSlice[int]()
+	var res = e.indexMgr.factory.New()
 	if s == nil {
 		for i := 0; i < e.GetDocumentsSize(); i++ {
 			res.InsertSorted(i)
@@ -164,7 +168,7 @@ func (e *Engine) intersection(s1, s2 ordered.OrderedStructure[int]) ordered.Orde
 	if s1 == nil || s2 == nil {
 		return nil
 	}
-	var res = ordered.NewSortedSlice[int]()
+	var res = e.indexMgr.factory.New()
 
 	i := 0
 	j := 0
@@ -192,7 +196,7 @@ func (e *Engine) union(s1, s2 ordered.OrderedStructure[int]) ordered.OrderedStru
 		return s1
 	}
 
-	var res = ordered.NewSortedSlice[int]()
+	var res = e.indexMgr.factory.New()
 
 	for i := range s1.GetLength() {
 		res.InsertSorted(s1.At(i))

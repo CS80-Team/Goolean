@@ -16,7 +16,9 @@ type Engine struct {
 
 	// `index` maps a tokens (keys) to an ordered list of document IDs that contain that token,
 	// the list stores the documents sotred by their ID's.
-	index map[string]ordered.OrderedStructure[int]
+	// index map[string]ordered.OrderedStructure[int]
+
+	indexMgr IndexManager
 
 	// `library` is a "set" that stores documents names to avoid adding the same document multiple times.
 	library map[string]struct{}
@@ -29,13 +31,13 @@ type Engine struct {
 	delimiterManager *tokenizer.DelimiterManager
 }
 
-func NewEngine(processor textprocessing.Processor, tokener *tokenizer.DelimiterManager) *Engine {
+func NewEngine(processor textprocessing.Processor, delimiterManager *tokenizer.DelimiterManager, idxMgr IndexManager) *Engine {
 	return &Engine{
 		docs:             make([]*internal.Document, 0),
-		index:            make(map[string]ordered.OrderedStructure[int]),
+		indexMgr:         idxMgr,
 		library:          make(map[string]struct{}),
 		processor:        processor,
-		delimiterManager: tokener,
+		delimiterManager: delimiterManager,
 	}
 }
 
@@ -63,14 +65,11 @@ func (e *Engine) GetDocumentsCopy() []*internal.Document {
 }
 
 func (e *Engine) GetKeyIndex(key string) ordered.OrderedStructure[int] {
-	if _, ok := e.index[key]; !ok {
-		panic("[Engine]: Key index not found")
-	}
-	return e.index[key]
+	return e.indexMgr.Get(key)
 }
 
 func (e *Engine) GetIndexSize() int {
-	return len(e.index)
+	return e.indexMgr.Size()
 }
 
 func (e *Engine) GetDocumentByID(id int) *internal.Document {
