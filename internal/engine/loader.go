@@ -30,7 +30,7 @@ func LoadDocs(path string) []*internal.Document {
 		}
 
 		if isLegible(filepath.Ext(path)) {
-			return []*internal.Document{{Path: path, Name: filepath.Base(path)}}
+			return []*internal.Document{{DirectoryPath: path, Name: filepath.Base(path)}}
 		}
 		return nil
 	}
@@ -39,7 +39,7 @@ func LoadDocs(path string) []*internal.Document {
 		if file.Type().IsDir() {
 			docs = append(docs, LoadDocs(filepath.Join(path, file.Name()))...)
 		} else if isLegible(filepath.Ext(file.Name())) {
-			docs = append(docs, &internal.Document{Path: path, Name: file.Name()})
+			docs = append(docs, internal.NewDocument(filepath.Join(path, file.Name())))
 		}
 	}
 

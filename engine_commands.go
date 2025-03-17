@@ -30,10 +30,15 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 	})
 
 	s.RegisterCommand(shell.Command{
-		Name:        "list",
-		Description: "List all documents, displayable by name or/and path or/and ID. Use -n to limit the number of documents.",
-		Handler:     listCommand(engine),
-		Usage:       "list <-id | -name | -path>",
+		Name: "list",
+		Description: "List all documents, displayable by name or/and path or/and ID or/and extension\n" +
+			"Use -sortby to sort results by name, path, id or extension\n" +
+			"Use -n to limit the number of results\n" +
+			"Default fields order: -id -name -path -ext\n" +
+			"Default sortby: id\n" +
+			"Default limit: all",
+		Handler: listCommand(engine),
+		Usage:   "list <-id | -name | -path | -ext> [-n <limit>] [-sortby <name | path | id | -ext>]",
 	})
 
 	s.RegisterCommand(shell.Command{
@@ -41,6 +46,15 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 		Description: "Load a new document into the engine",
 		Handler:     loadCommand(engine),
 		Usage:       "load <document_path>",
+	})
+
+	s.RegisterCommand(shell.Command{
+		Name: "find",
+		Description: "Find a document by name or id.\n" +
+			"Display the document's id, name and path\n" +
+			"Default search field: -name\n",
+		Handler: findCommand(engine),
+		Usage:   "find <-id | -name> <value> || find <document_name>",
 	})
 
 	s.RegisterEarlyExecCommand(shell.EarlyCommand{
@@ -80,6 +94,65 @@ func isWSL() bool {
 	return strings.Contains(strings.ToLower(string(data)), "microsoft")
 }
 
+func getDocumentByField(engine *engine.Engine, search, value string) (internal.Document, string) {
+	var doc internal.Document
+	if search != "-id" && search != "-name" {
+		return doc, "Invalid search field, must be one of: -id, -name\n"
+	}
+
+	switch search {
+	case "-id":
+		id, err := strconv.Atoi(value)
+		if err != nil {
+			return doc, "Invalid document ID\n"
+		}
+
+		if id < 0 || id >= engine.GetDocumentsSize() {
+			return doc, "Document ID out of range, Docs Ids [0, " + strconv.Itoa(engine.GetDocumentsSize()-1) + "]\n"
+		}
+
+		doc = engine.GetDocumentByIDCopy(id)
+	default: // -name
+		doc = engine.GetDocumentByNameCopy(value)
+	}
+
+	return doc, ""
+}
+
+func findCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
+	return func(s *shell.Shell, args []string) shell.Status {
+		var doc internal.Document
+		if len(args) > 2 {
+			s.Write("Invalid number of arguments\n")
+			return shell.FAIL
+		}
+
+		if len(args) == 1 {
+			if args[0] == "-id" || args[0] == "-name" {
+				s.Write("Missing value for search field\n")
+				return shell.FAIL
+			}
+			doc = engine.GetDocumentByNameCopy(args[0])
+
+		} else {
+			var err string
+			doc, err = getDocumentByField(engine, args[0], args[1])
+			if err != "" {
+				s.Write(err)
+				return shell.FAIL
+			}
+		}
+
+		if doc == (internal.Document{}) {
+			s.Write("Document not found\n")
+		} else {
+			s.Write("Document found:\n" + doc.String())
+		}
+
+		return shell.OK
+	}
+}
+
 func openCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
 	return func(s *shell.Shell, args []string) shell.Status {
 		id, err := strconv.Atoi(args[0])
@@ -93,7 +166,7 @@ func openCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 		}
 		s.Write("Opening document: " + engine.GetDocumentByID(id).Name)
 		doc := engine.GetDocumentByID(id)
-		err = openFile(filepath.Join(doc.Path, doc.Name))
+		err = openFile(filepath.Join(doc.DirectoryPath, doc.Name))
 		if err != nil {
 			s.Write("Error opening file\n")
 			return shell.FAIL
@@ -140,7 +213,7 @@ func loadCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 func engineStatsCommand(engine *engine.Engine) func(s *shell.Shell) {
 	return func(s *shell.Shell) {
 		s.Write("Engine stats:\n")
-		s.Write("Total documents: " + strconv.Itoa(len(engine.GetDocuments())) + "\n")
+		s.Write("Total documents: " + strconv.Itoa(engine.GetDocumentsSize()) + "\n")
 		s.Write("Total keys: " + strconv.Itoa(engine.GetIndexSize()) + "\n")
 	}
 }
@@ -164,7 +237,7 @@ func listCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 }
 
 func parseListArgs(args []string) ([]string, int, string, string) {
-	var validArgs = []string{"-name", "-path", "-id", "-n", "-sortby"}
+	var validArgs = []string{"-name", "-path", "-id", "-ext", "-n", "-sortby"}
 	var displayFields []string
 	var seen = make(map[string]bool)
 	var limit = -1
@@ -201,8 +274,8 @@ func parseListArgs(args []string) ([]string, int, string, string) {
 
 			sortby = args[i+1]
 
-			if sortby != "name" && sortby != "path" && sortby != "id" {
-				return nil, -1, "", "Invalid value (" + sortby + ") for -sortby. Must be one of: name, path, id."
+			if sortby != "name" && sortby != "path" && sortby != "id" && sortby != "ext" {
+				return nil, -1, "", "Invalid value (" + sortby + ") for -sortby. Must be one of: name, path, id, ext."
 			}
 
 			i++
@@ -212,7 +285,7 @@ func parseListArgs(args []string) ([]string, int, string, string) {
 	}
 
 	if len(displayFields) == 0 {
-		displayFields = []string{"-id", "-name", "-path"}
+		displayFields = []string{"-id", "-name", "-path", "-ext"}
 	}
 
 	return displayFields, limit, sortby, ""
@@ -230,9 +303,14 @@ func getSortedDocuments(engine *engine.Engine, sortby string) []*internal.Docume
 		})
 	} else if sortby == "path" {
 		slices.SortFunc(docs, func(i, j *internal.Document) int {
-			return strings.Compare(i.Path, j.Path)
+			return strings.Compare(i.DirectoryPath, j.DirectoryPath)
+		})
+	} else if sortby == "-ext" {
+		slices.SortFunc(docs, func(i, j *internal.Document) int {
+			return strings.Compare(i.Ext, j.Ext)
 		})
 	}
+
 	return docs
 }
 
@@ -245,7 +323,9 @@ func displayDocuments(s *shell.Shell, docs []*internal.Document, displayFields [
 			case "-name":
 				s.Write(docs[i].Name + " ")
 			case "-path":
-				s.Write(docs[i].Path + " ")
+				s.Write(docs[i].DirectoryPath + " ")
+			case "-ext":
+				s.Write(docs[i].Ext + " ")
 			}
 		}
 		s.Write("\n")

@@ -45,7 +45,7 @@ func (e *Engine) AddDocument(doc *internal.Document) {
 	if _, ok := e.library[doc.Name]; !ok {
 		doc.ID = e.GetNextDocID()
 		e.docs = append(e.docs, doc)
-		e.library[doc.Path] = struct{}{}
+		e.library[doc.DirectoryPath] = struct{}{}
 		e.parseDocument(doc)
 	}
 }
@@ -78,6 +78,34 @@ func (e *Engine) GetDocumentByID(id int) *internal.Document {
 	}
 
 	return e.docs[id]
+}
+
+func (e *Engine) GetDocumentByIDCopy(id int) internal.Document {
+	if id < 0 && id >= len(e.docs) {
+		panic("[Engine]: Document ID out of range")
+	}
+
+	return internal.Document{
+		ID:            id,
+		Name:          e.docs[id].Name,
+		DirectoryPath: e.docs[id].DirectoryPath,
+		Ext:           e.docs[id].Ext,
+	}
+}
+
+func (e *Engine) GetDocumentByNameCopy(name string) internal.Document {
+	for _, doc := range e.docs {
+		if name == doc.Name || name == doc.GetFileNameWithExt() {
+			return internal.Document{
+				ID:            doc.ID,
+				Name:          doc.Name,
+				DirectoryPath: doc.DirectoryPath,
+				Ext:           doc.Ext,
+			}
+		}
+	}
+
+	return internal.Document{}
 }
 
 func (e *Engine) GetDocumentsSize() int {

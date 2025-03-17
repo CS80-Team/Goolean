@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/CS80-Team/Boolean-IR-System/internal"
 	"github.com/CS80-Team/Boolean-IR-System/internal/engine/tokenizer"
@@ -19,9 +18,7 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 		panic("[Indexer]: Document cannot be nil")
 	}
 
-	filePath := filepath.Join(doc.Path, doc.Name)
-
-	file, err := os.Open(filePath)
+	file, err := os.Open(doc.GetFilePath())
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "[Indexer]: Error opening file: %s\n", err)
 		return

@@ -17,6 +17,11 @@ const (
 	NOT_FOUND Status = "NOT_FOUND"
 )
 
+const (
+	SHELL_PROMPT = ">>> "
+	SHELL_PREFIX = "[SHELL]: "
+)
+
 type Shell struct {
 	commands          map[string]Command
 	earlyExecCommands []EarlyCommand
@@ -147,14 +152,14 @@ func (s *Shell) Write(output string) {
 	_, _ = s.outStream.Write([]byte(output))
 }
 
-func (s *Shell) Run(welcomeMessage string) {
+func (s *Shell) Run(welcMessage string) {
 	var stat Status
 	s.executeCommand("clear", nil)
-	s.Write(welcomeMessage)
+	s.Write(welcMessage)
 	for {
 		s.Write("\n")
 		s.executeEarlyCommands()
-		s.Write(">>> ")
+		s.Write(SHELL_PROMPT)
 
 		input := s.read()
 		cmd, args := parseInput(input)
@@ -163,7 +168,7 @@ func (s *Shell) Run(welcomeMessage string) {
 		if stat == EXIT {
 			break
 		} else if stat == FAIL {
-			s.Write(s.commands[cmd].Usage + "\n")
+			s.Write(SHELL_PREFIX + s.commands[cmd].Usage + "\n")
 		} else if stat == NOT_FOUND {
 			s.handleNotFound(cmd)
 		}
