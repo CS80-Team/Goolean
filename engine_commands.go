@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -59,12 +60,24 @@ func openFile(path string) error {
 	case "darwin":
 		cmd = exec.Command("open", path)
 	case "linux":
-		cmd = exec.Command("xdg-open", path)
+		if isWSL() {
+			cmd = exec.Command("wslview", path)
+		} else {
+			cmd = exec.Command("xdg-open", path)
+		}
 	default:
 		return nil
 	}
 
 	return cmd.Start()
+}
+
+func isWSL() bool {
+	data, err := os.ReadFile("/proc/version")
+	if err != nil {
+		return false
+	}
+	return strings.Contains(strings.ToLower(string(data)), "microsoft")
 }
 
 func openCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
