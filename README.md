@@ -1,8 +1,8 @@
-# Boolean IR System
+# BooleanEngine
 
 ## Overview
 
-The Boolean IR (Information Retrieval) System is a search engine that allows users to perform Boolean queries on a dataset of documents. The system consists of an engine that processes and indexes documents and a shell that interact with the engine through a set of commands.
+The `BooleanEngine` is a search engine that allows users to perform boolean queries on a dataset of documents (corpus). The system consists of an engine that processes and indexes documents and a shell that interact with the engine through a set of commands.
 
 ## Features
 
@@ -40,7 +40,7 @@ The Boolean IR (Information Retrieval) System is a search engine that allows use
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/CS80-Team/Boolean-IR-System/
+   git clone https://github.com/CS80-Team/BooleanEngine/
    cd boolean-ir-system
    ```
 2. Build the project:
@@ -52,7 +52,7 @@ The Boolean IR (Information Retrieval) System is a search engine that allows use
 
 ## System Overview
 
-![System Overview](https://github.com/CS80-Team/Boolean-IR-System/blob/master/docs/BIRSystemOverview.png)
+![System Overview](https://github.com/CS80-Team/BooleanEngine/blob/master/docs/BIRSystemOverview.png)
 
 ## Usage Example
 

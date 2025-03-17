@@ -1,8 +1,8 @@
 package engine
 
 import (
-	"github.com/CS80-Team/Boolean-IR-System/internal/engine/structuresFactory"
-	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
+	"github.com/CS80-Team/BooleanEngine/internal/engine/structuresFactory"
+	"github.com/CS80-Team/BooleanEngine/internal/structures/ordered"
 )
 
 type IndexManager struct {

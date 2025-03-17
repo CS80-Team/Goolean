@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CS80-Team/Boolean-IR-System/internal"
+	"github.com/CS80-Team/BooleanEngine/internal"
 )
 
 func isLegible(ext string) bool {

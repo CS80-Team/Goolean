@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CS80-Team/Boolean-IR-System/internal/structures"
-	"github.com/CS80-Team/Boolean-IR-System/internal/structures/ordered"
+	"github.com/CS80-Team/BooleanEngine/internal/structures"
+	"github.com/CS80-Team/BooleanEngine/internal/structures/ordered"
 )
 
 const (

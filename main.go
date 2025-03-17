@@ -4,12 +4,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CS80-Team/Boolean-IR-System/internal/engine/structuresFactory"
+	"github.com/CS80-Team/BooleanEngine/internal/engine/structuresFactory"
 
-	"github.com/CS80-Team/Boolean-IR-System/internal/engine"
-	"github.com/CS80-Team/Boolean-IR-System/internal/engine/tokenizer"
-	"github.com/CS80-Team/Boolean-IR-System/internal/textprocessing"
-	"github.com/CS80-Team/Boolean-IR-System/shell"
+	"github.com/CS80-Team/BooleanEngine/internal/engine"
+	"github.com/CS80-Team/BooleanEngine/internal/engine/tokenizer"
+	"github.com/CS80-Team/BooleanEngine/internal/textprocessing"
+	"github.com/CS80-Team/BooleanEngine/shell"
 )
 
 func main() {
