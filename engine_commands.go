@@ -75,7 +75,13 @@ func openFile(path string) error {
 		cmd = exec.Command("open", path)
 	case "linux":
 		if isWSL() {
-			cmd = exec.Command("wslview", path)
+			// Convert the path to windows path
+			convertCmd := exec.Command("wslpath", "-w", path)
+			path, err := convertCmd.Output()
+			if err != nil {
+				return err
+			}
+			cmd = exec.Command("explorer.exe", strings.TrimSpace(string(path)))
 		} else {
 			cmd = exec.Command("xdg-open", path)
 		}
@@ -164,11 +170,13 @@ func openCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 			s.Write("Document ID out of range, Docs Ids [0, " + strconv.Itoa(len(engine.GetDocuments())-1) + "]\n")
 			return shell.FAIL
 		}
-		s.Write("Opening document: " + engine.GetDocumentByID(id).Name)
 		doc := engine.GetDocumentByID(id)
-		err = openFile(filepath.Join(doc.DirectoryPath, doc.Name))
+		path := filepath.Join(doc.DirectoryPath, doc.Name+doc.Ext)
+		s.Write("Opening document: " + doc.Name + ", path: " + path + "\n")
+		err = openFile(path)
 		if err != nil {
 			s.Write("Error opening file\n")
+			s.Write(err.Error())
 			return shell.FAIL
 		}
 
