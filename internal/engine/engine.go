@@ -15,9 +15,8 @@ type Engine struct {
 	docs []*internal.Document
 
 	// `index` maps a tokens (keys) to an ordered list of document IDs that contain that token,
-	// the list stores the documents sotred by their ID's.
+	// the list stores the documents sorted by their ID's.
 	// index map[string]ordered.OrderedStructure[int]
-
 	indexMgr IndexManager
 
 	// `library` is a "set" that stores documents names to avoid adding the same document multiple times.

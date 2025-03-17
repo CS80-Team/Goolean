@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -30,7 +31,8 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 	})
 
 	s.RegisterCommand(shell.Command{
-		Name: "list",
+		Name:    "list",
+		Aliases: []string{"ls"},
 		Description: "List all documents, displayable by name or/and path or/and ID or/and extension\n" +
 			"Use -sortby to sort results by name, path, id or extension\n" +
 			"Use -n to limit the number of results\n" +
@@ -300,25 +302,24 @@ func parseListArgs(args []string) ([]string, int, string, string) {
 }
 
 func getSortedDocuments(engine *engine.Engine, sortby string) []*internal.Document {
-	if sortby == "id" {
+	docs := engine.GetDocumentsCopy()
+
+	switch sortby {
+	case "name":
+		sort.Slice(docs, func(i, j int) bool {
+			return docs[i].Name < docs[j].Name
+		})
+	case "path":
+		sort.Slice(docs, func(i, j int) bool {
+			return docs[i].DirectoryPath < docs[j].DirectoryPath
+		})
+	case "-ext":
+		sort.Slice(docs, func(i, j int) bool {
+			return docs[i].Ext < docs[j].Ext
+		})
+	default:
 		return engine.GetDocuments()
 	}
-
-	docs := engine.GetDocumentsCopy()
-	if sortby == "name" {
-		slices.SortFunc(docs, func(i, j *internal.Document) int {
-			return strings.Compare(i.Name, j.Name)
-		})
-	} else if sortby == "path" {
-		slices.SortFunc(docs, func(i, j *internal.Document) int {
-			return strings.Compare(i.DirectoryPath, j.DirectoryPath)
-		})
-	} else if sortby == "-ext" {
-		slices.SortFunc(docs, func(i, j *internal.Document) int {
-			return strings.Compare(i.Ext, j.Ext)
-		})
-	}
-
 	return docs
 }
 

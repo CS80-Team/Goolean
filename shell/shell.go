@@ -1,6 +1,8 @@
 package shell
 
 import (
+	"errors"
+	"github.com/chzyer/readline"
 	"io"
 	"os"
 	"os/exec"
@@ -27,14 +29,27 @@ type Shell struct {
 	earlyExecCommands []EarlyCommand
 	inStream          io.Reader
 	outStream         io.Writer
+	inputHandler      *InputHandler
+	prompt            string
+	historyFile       string
 }
 
 func NewShell(istream io.Reader, ostream io.Writer) *Shell {
 	sh := &Shell{
-		commands:  make(map[string]Command),
-		inStream:  istream,
-		outStream: ostream,
+		commands:    make(map[string]Command),
+		inStream:    istream,
+		outStream:   ostream,
+		prompt:      SHELL_PROMPT,
+		historyFile: ".shell_history",
 	}
+
+	// Initialize the InputHandler
+	listener := &KeyListener{shell: sh}
+	inputHandler, err := NewInputHandler(sh.prompt, sh.historyFile, listener)
+	if err != nil {
+		panic(err)
+	}
+	sh.inputHandler = inputHandler
 
 	sh.registerBuiltInCommands()
 
@@ -66,40 +81,47 @@ func (sh *Shell) registerBuiltInCommands() {
 
 	sh.RegisterCommand(Command{
 		Name:        "clear",
+		Aliases:     []string{"cls"},
 		Description: "Clear the screen",
 		Handler: func(s *Shell, args []string) Status {
-			switch runtime.GOOS {
-			case "windows":
-				cmd := exec.Command("cmd", "/c", "cls")
-				cmd.Stdout = os.Stdout
-				_ = cmd.Run()
-			default:
-				cmd := exec.Command("clear")
-				cmd.Stdout = os.Stdout
-				_ = cmd.Run()
-			}
-
+			s.clearScreen()
 			return OK
 		},
 		Usage: "clear",
 	})
 }
 
-func (s *Shell) RegisterCommand(cmd Command) {
-	s.commands[cmd.Name] = cmd
-}
-
-func (s *Shell) RegisterEarlyExecCommand(cmd EarlyCommand) {
-	s.earlyExecCommands = append(s.earlyExecCommands, cmd)
-}
-
-func (s *Shell) executeEarlyCommands() {
-	for _, cmd := range s.earlyExecCommands {
-		cmd.Handler(s)
+func (sh *Shell) clearScreen() {
+	switch runtime.GOOS {
+	case "windows":
+		cmd := exec.Command("cmd", "/c", "cls")
+		cmd.Stdout = os.Stdout
+		_ = cmd.Run()
+	default:
+		cmd := exec.Command("clear")
+		cmd.Stdout = os.Stdout
+		_ = cmd.Run()
+	}
+	if sh.inputHandler.reader != nil {
+		sh.inputHandler.reader.Refresh()
 	}
 }
 
-func (s *Shell) executeCommand(cmd string, args []string) Status {
+func (sh *Shell) RegisterCommand(cmd Command) {
+	sh.commands[cmd.Name] = cmd
+}
+
+func (sh *Shell) RegisterEarlyExecCommand(cmd EarlyCommand) {
+	sh.earlyExecCommands = append(sh.earlyExecCommands, cmd)
+}
+
+func (sh *Shell) executeEarlyCommands() {
+	for _, cmd := range sh.earlyExecCommands {
+		cmd.Handler(sh)
+	}
+}
+
+func (sh *Shell) executeCommand(cmd string, args []string) Status {
 	if strings.ToUpper(cmd) == string(EXIT) {
 		return EXIT
 	}
@@ -108,34 +130,50 @@ func (s *Shell) executeCommand(cmd string, args []string) Status {
 		return OK
 	}
 
-	if command, ok := s.commands[cmd]; ok {
-		return command.Handler(s, args)
+	if command, ok := sh.findCommandByNameOrAlias(cmd); ok {
+		return command.Handler(sh, args)
 	}
 
 	return NOT_FOUND
 }
 
-func (s *Shell) GetCommands() []Command {
+func (sh *Shell) findCommandByNameOrAlias(cmd string) (Command, bool) {
+	if command, ok := sh.commands[cmd]; ok {
+		return command, true
+	}
+
+	for _, command := range sh.commands {
+		for _, alias := range command.Aliases {
+			if alias == cmd {
+				return command, true
+			}
+		}
+	}
+
+	return Command{}, false
+}
+
+func (sh *Shell) GetCommands() []Command {
 	var cmds []Command
-	for _, cmd := range s.commands {
+	for _, cmd := range sh.commands {
 		cmds = append(cmds, cmd)
 	}
 	return cmds
 }
 
-func (s *Shell) SetInputStream(in io.Reader) {
-	s.inStream = in
+func (sh *Shell) SetInputStream(in io.Reader) {
+	sh.inStream = in
 }
 
-func (s *Shell) SetOutputStream(out io.Writer) {
-	s.outStream = out
+func (sh *Shell) SetOutputStream(out io.Writer) {
+	sh.outStream = out
 }
 
-func (s *Shell) read() string {
+func (sh *Shell) read() string {
 	var input string
 	buf := make([]byte, 1024)
 	for {
-		n, err := s.inStream.Read(buf)
+		n, err := sh.inStream.Read(buf)
 
 		if n > 0 {
 			input += string(buf[:n])
@@ -148,62 +186,88 @@ func (s *Shell) read() string {
 	return input
 }
 
-func (s *Shell) Write(output string) {
-	_, _ = s.outStream.Write([]byte(output))
+func (sh *Shell) Write(output string) {
+	_, _ = sh.outStream.Write([]byte(output))
 }
 
-func (s *Shell) Run(welcMessage string) {
+func (sh *Shell) Run(welcMessage string) {
 	var stat Status
-	s.executeCommand("clear", nil)
-	s.Write(welcMessage)
-	for {
-		s.Write("\n")
-		s.executeEarlyCommands()
-		s.Write(SHELL_PROMPT)
 
-		input := s.read()
-		cmd, args := parseInput(input)
-		stat = s.executeCommand(cmd, args)
+	sh.clearScreen()
+	sh.Write(welcMessage)
+	for {
+		sh.Write("\n")
+		sh.executeEarlyCommands()
+
+		input, err := sh.inputHandler.reader.Readline()
+		if err != nil {
+			if errors.Is(err, readline.ErrInterrupt) {
+				continue
+			} else if err == io.EOF {
+				sh.Write("\n")
+				break
+			}
+			sh.Write("Error reading input: " + err.Error() + "\n")
+			continue
+		}
+
+		cmd, args := sh.parseInput(input)
+		stat = sh.executeCommand(cmd, args)
 
 		if stat == EXIT {
 			break
 		} else if stat == FAIL {
-			s.Write(SHELL_PREFIX + s.commands[cmd].Usage + "\n")
+			sh.Write(SHELL_PREFIX + sh.commands[cmd].Usage + "\n")
 		} else if stat == NOT_FOUND {
-			s.handleNotFound(cmd)
+			sh.handleCommandOrAliasNotFound(cmd)
 		}
 	}
 }
 
-func (s *Shell) handleNotFound(cmd string) {
-	nearestCmd := s.getNearestCommand(cmd)
+func (sh *Shell) handleCommandOrAliasNotFound(cmd string) {
+	nearestCmd, matchedAlias := sh.getNearestCommandOrAlias(cmd)
 	if len(cmd) > 20 {
 		cmd = cmd[:20] + "..."
 	}
 
-	s.Write("Command (" + cmd + ") not found, ")
+	sh.Write("Command (" + cmd + ") not found, ")
 
 	if nearestCmd != "" {
-		s.Write("did you mean `" + nearestCmd + "`?, ")
-
+		if matchedAlias != "" {
+			sh.Write("did you mean `" + matchedAlias + "` (alias for `" + nearestCmd + "`)?, ")
+		} else {
+			sh.Write("did you mean `" + nearestCmd + "`?, ")
+		}
 	}
-	s.Write("type `help` for list of commands\n")
+	sh.Write("type `help` for list of commands\n")
 }
 
-func (s *Shell) getNearestCommand(cmd string) string {
+func (sh *Shell) getNearestCommandOrAlias(cmd string) (string, string) {
 	best := 2
 	nearestCmd := ""
-	for _, c := range s.commands {
+	matchedAlias := ""
+
+	for _, c := range sh.commands {
 		dist := editDistance(c.Name, cmd)
 		if dist <= best {
 			best = dist
 			nearestCmd = c.Name
+			matchedAlias = ""
+		}
+		// Also check aliases
+		for _, alias := range c.Aliases {
+			dist := editDistance(alias, cmd)
+			if dist <= best {
+				best = dist
+				nearestCmd = c.Name
+				matchedAlias = alias
+			}
 		}
 	}
-	return nearestCmd
+	return nearestCmd, matchedAlias
 }
 
-func parseInput(input string) (string, []string) {
+func (sh *Shell) parseInput(input string) (string, []string) {
 	tokens := strings.Fields(input)
 	if len(tokens) == 0 {
 		return "", nil

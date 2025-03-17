@@ -6,8 +6,8 @@ type Tokenizer struct {
 	delimiterManager *DelimiterManager
 }
 
-func NewTokenizer(line *string, tokener *DelimiterManager) *Tokenizer {
-	return &Tokenizer{line: line, idx: 0, delimiterManager: tokener}
+func NewTokenizer(line *string, delimiterManager *DelimiterManager) *Tokenizer {
+	return &Tokenizer{line: line, idx: 0, delimiterManager: delimiterManager}
 }
 
 func (t *Tokenizer) NextToken() string {

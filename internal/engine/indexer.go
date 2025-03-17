@@ -10,7 +10,7 @@ import (
 )
 
 /*
-* `parseDocument` reads the document and tokenizes it using the engine's tokener
+* `parseDocument` reads the document and tokenizes it using the engine's delimiterManager
 * then it processes the tokens using the engine's processor and indexes them.
  */
 func (e *Engine) parseDocument(doc *internal.Document) {
@@ -31,11 +31,11 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 	scan := bufio.NewScanner(file)
 	for scan.Scan() {
 		var line = scan.Text()
-		var tokenizer = tokenizer.NewTokenizer(&line, e.delimiterManager)
+		var newTokenizer = tokenizer.NewTokenizer(&line, e.delimiterManager)
 		var token string
 
-		for tokenizer.HasNext() {
-			token = tokenizer.NextToken()
+		for newTokenizer.HasNext() {
+			token = newTokenizer.NextToken()
 
 			token = e.ProcessToken(token)
 
