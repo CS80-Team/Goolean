@@ -1,0 +1,4 @@
+time=2025-03-18T18:19:32.236+02:00 level=INFO source=/media/omar/Programs/Projects/Go/Goolean/shell/key_listener.go:13 msg="Tab key pressed: clea"
+time=2025-03-18T18:19:35.452+02:00 level=INFO source=/media/omar/Programs/Projects/Go/Goolean/shell/key_listener.go:13 msg="Tab key pressed: l"
+time=2025-03-18T18:19:39.868+02:00 level=ERROR source=/media/omar/Programs/Projects/Go/Goolean/shell/shell.go:149 msg="Command cler not found\n"
+time=2025-03-18T18:19:42.909+02:00 level=INFO source=/media/omar/Programs/Projects/Go/Goolean/shell/key_listener.go:13 msg="Tab key pressed: exi"

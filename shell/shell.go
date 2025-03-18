@@ -2,10 +2,13 @@ package shell
 
 import (
 	"errors"
+	"fmt"
+	"github.com/CS80-Team/Goolean/internal"
 	"io"
 	"os"
 	"os/exec"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -21,27 +24,32 @@ const (
 )
 
 const (
-	SHELL_PROMPT = ">>> "
-	SHELL_PREFIX = "[SHELL]: "
+	SHELL_PROMPT   = ">>> "
+	SHELL_PREFIX   = "[SHELL]: "
+	COMMAND_PREFIX = "[COMMAND]: "
 )
 
 type Shell struct {
 	commands          map[string]Command
+	rootCommand       map[string]string
 	earlyExecCommands []EarlyCommand
 	inStream          io.Reader
 	outStream         io.Writer
 	inputHandler      *InputHandler
 	prompt            string
 	historyFile       string
+	logger            *internal.Logger
 }
 
-func NewShell(istream io.Reader, ostream io.Writer) *Shell {
+func NewShell(istream io.Reader, ostream io.Writer, historyFile string, logger *internal.Logger) *Shell {
 	sh := &Shell{
 		commands:    make(map[string]Command),
 		inStream:    istream,
 		outStream:   ostream,
 		prompt:      SHELL_PROMPT,
-		historyFile: ".shell_history",
+		historyFile: historyFile,
+		rootCommand: make(map[string]string),
+		logger:      logger,
 	}
 
 	// Initialize the InputHandler
@@ -53,43 +61,7 @@ func NewShell(istream io.Reader, ostream io.Writer) *Shell {
 	sh.inputHandler = inputHandler
 
 	sh.registerBuiltInCommands()
-
 	return sh
-}
-
-func (sh *Shell) registerBuiltInCommands() {
-	sh.RegisterCommand(Command{
-		Name:        "exit",
-		Description: "Exit the shell",
-		Handler: func(s *Shell, args []string) Status {
-			return EXIT
-		},
-		Usage: "exit",
-	})
-
-	sh.RegisterCommand(Command{
-		Name:        "help",
-		Description: "List all available commands",
-		Handler: func(s *Shell, args []string) Status {
-			for _, cmd := range sh.GetCommands() {
-				sh.Write(cmd.Name + ": " + cmd.Description + "\n")
-				sh.Write("    Usage: " + cmd.Usage + "\n\n")
-			}
-			return OK
-		},
-		Usage: "help",
-	})
-
-	sh.RegisterCommand(Command{
-		Name:        "clear",
-		Aliases:     []string{"cls"},
-		Description: "Clear the screen",
-		Handler: func(s *Shell, args []string) Status {
-			s.clearScreen()
-			return OK
-		},
-		Usage: "clear",
-	})
 }
 
 func (sh *Shell) clearScreen() {
@@ -108,7 +80,18 @@ func (sh *Shell) clearScreen() {
 	}
 }
 
+func (sh *Shell) addAlias(alias string, cmd string) {
+	if cm, ok := sh.commands[cmd]; ok {
+		sh.logger.GetLogger().Warn(fmt.Sprintf("Alias %s already exists for command %s\n", alias, cm.Name))
+	}
+	sh.rootCommand[alias] = cmd
+}
+
 func (sh *Shell) RegisterCommand(cmd Command) {
+	for _, alias := range cmd.Aliases {
+		sh.addAlias(alias, cmd.Name)
+	}
+
 	sh.commands[cmd.Name] = cmd
 }
 
@@ -122,35 +105,59 @@ func (sh *Shell) executeEarlyCommands() {
 	}
 }
 
-func (sh *Shell) executeCommand(cmd string, args []string) Status {
-	if strings.ToUpper(cmd) == string(EXIT) {
-		return EXIT
-	}
-
-	if cmd == "" {
-		return OK
-	}
-
-	if command, ok := sh.findCommandByNameOrAlias(cmd); ok {
-		return command.Handler(sh, args)
-	}
-
-	return NOT_FOUND
-}
-
-func (sh *Shell) findCommandByNameOrAlias(cmd string) (Command, bool) {
-	if command, ok := sh.commands[cmd]; ok {
-		return command, true
-	}
-
-	for _, command := range sh.commands {
-		for _, alias := range command.Aliases {
-			if alias == cmd {
-				return command, true
-			}
+func (sh *Shell) autoCompleteCommand(cmd string) (string, bool) {
+	for c := range sh.commands {
+		if strings.HasPrefix(c, cmd) {
+			return c, true
 		}
 	}
 
+	return "", false
+}
+
+//func (sh *Shell) autoCompleteArg(cmd, argPrefix string) (string, bool) {
+//	if command, ok := sh.findCommandByNameOrAlias(cmd); ok {
+//		for _, arg := range sh.commands[command.Name].Args {
+//			if strings.HasPrefix(arg.Name, argPrefix) {
+//				return arg.Name, true
+//			}
+//		}
+//	}
+//
+//	return "", false
+//}
+
+func (sh *Shell) executeCommand(cmdOrAlias string, args []string) Status {
+	if strings.ToUpper(cmdOrAlias) == string(EXIT) {
+		return EXIT
+	}
+
+	if cmdOrAlias == "" {
+		return OK
+	}
+
+	if command, ok := sh.findCommandByNameOrAlias(cmdOrAlias); ok {
+		ok, err := command.ValidateArgs(args)
+		if !ok {
+			sh.Write(COMMAND_PREFIX + "Invalid arguments, " + err + "\n")
+			sh.logger.GetLogger().Error(fmt.Sprintf("Invalid arguments for command %s: %s", cmdOrAlias, err))
+			return FAIL
+		}
+		return command.Handler(sh, args)
+	}
+
+	sh.logger.GetLogger().Error(fmt.Sprintf("Command %s not found\n", cmdOrAlias))
+	return NOT_FOUND
+}
+
+func (sh *Shell) findCommandByNameOrAlias(cmdOrAlias string) (Command, bool) {
+	if command, ok := sh.commands[cmdOrAlias]; ok {
+		return command, true
+	}
+
+	if command, ok := sh.rootCommand[cmdOrAlias]; ok {
+		return sh.commands[command], true
+	}
 	return Command{}, false
 }
 
@@ -196,33 +203,52 @@ func (sh *Shell) Run(welcMessage string) {
 
 	sh.clearScreen()
 	sh.Write(welcMessage)
+	sh.sortEarlyCommands()
+
 	for {
 		sh.Write("\n")
 		sh.executeEarlyCommands()
 
-		input, err := sh.inputHandler.reader.Readline()
+		//
+		input, err := sh.inputHandler.ReadLine()
 		if err != nil {
 			if errors.Is(err, readline.ErrInterrupt) {
+				// TODO: End running command (run the command in a goroutine)
 				continue
-			} else if err == io.EOF {
-				sh.Write("\n")
-				break
 			}
+
 			sh.Write("Error reading input: " + err.Error() + "\n")
 			continue
 		}
 
-		cmd, args := sh.parseInput(input)
-		stat = sh.executeCommand(cmd, args)
+		commandOrAlias, args := sh.parseInput(input)
+		stat = sh.executeCommand(commandOrAlias, args)
 
 		if stat == EXIT {
 			break
 		} else if stat == FAIL {
-			sh.Write(SHELL_PREFIX + sh.commands[cmd].Usage + "\n")
+			command, found := sh.findCommandByNameOrAlias(commandOrAlias)
+			if !found {
+				sh.handleCommandOrAliasNotFound(commandOrAlias)
+			} else {
+				sh.Write(SHELL_PREFIX + "Command failed, Usage: " + command.Usage + "\n")
+			}
 		} else if stat == NOT_FOUND {
-			sh.handleCommandOrAliasNotFound(cmd)
+			sh.handleCommandOrAliasNotFound(commandOrAlias)
 		}
 	}
+
+	sh.Exit()
+}
+
+func (sh *Shell) Exit() {
+	sh.logger.Close()
+}
+
+func (sh *Shell) sortEarlyCommands() {
+	sort.SliceStable(sh.earlyExecCommands, func(i, j int) bool {
+		return sh.earlyExecCommands[i].Priority > sh.earlyExecCommands[j].Priority
+	})
 }
 
 func (sh *Shell) handleCommandOrAliasNotFound(cmd string) {

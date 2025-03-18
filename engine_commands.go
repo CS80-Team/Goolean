@@ -16,55 +16,92 @@ import (
 )
 
 func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
-	s.RegisterCommand(shell.Command{
-		Name:        "open",
-		Description: "Open a document by ID in the default editor",
-		Handler:     openCommand(engine),
-		Usage:       "open <document_id>",
-	})
+	s.RegisterCommand(
+		shell.NewCommand(
+			"open",
+			"Open a document by ID in the default editor",
+			"open <document_id>",
+			[]shell.Argument{},
+			[]string{},
+			openCommand(engine),
+			func(args []string) (bool, string) {
+				return true, ""
+			},
+		),
+	)
 
-	s.RegisterCommand(shell.Command{
-		Name:        "query",
-		Description: "Query the engine for a keyword or a boolean expression",
-		Handler:     queryCommand(engine),
-		Usage:       "query <keyword> | <expression>",
-	})
+	s.RegisterCommand(
+		shell.NewCommand(
+			"query",
+			"Query the engine for a keyword or a boolean expression",
+			"query <keyword> | <expression>",
+			[]shell.Argument{},
+			[]string{},
+			queryCommand(engine),
+			func(args []string) (bool, string) {
+				return true, ""
+			},
+		),
+	)
 
-	s.RegisterCommand(shell.Command{
-		Name:    "list",
-		Aliases: []string{"ls"},
-		Description: "List all documents, displayable by name or/and path or/and ID or/and extension\n" +
-			"Use -sortby to sort results by name, path, id or extension\n" +
-			"Use -n to limit the number of results\n" +
-			"Default fields order: -id -name -path -ext\n" +
-			"Default sortby: id\n" +
-			"Default limit: all",
-		Handler: listCommand(engine),
-		Usage:   "list <-id | -name | -path | -ext> [-n <limit>] [-sortby <name | path | id | -ext>]",
-	})
+	s.RegisterCommand(
+		shell.NewCommand(
+			"list",
+			"List all documents, displayable by name or/and path or/and ID or/and extension\n"+
+				"Use -sortby to sort results by name, path, id or extension\n"+
+				"Use -n to limit the number of results\n"+
+				"Default fields order: -id -name -path -ext\n"+
+				"Default sortby: id\n"+
+				"Default limit: all",
+			"list <-id | -name | -path | -ext> [-n <limit>] [-sortby <name | path | id | -ext>]",
+			[]shell.Argument{},
+			[]string{"ls"},
+			listCommand(engine),
+			func(args []string) (bool, string) {
+				return true, ""
+			},
+		),
+	)
 
-	s.RegisterCommand(shell.Command{
-		Name:        "load",
-		Description: "Load a new document into the engine",
-		Handler:     loadCommand(engine),
-		Usage:       "load <document_path>",
-	})
+	s.RegisterCommand(
+		shell.NewCommand(
+			"load",
+			"Load a new document into the engine",
+			"load <document_path>",
+			[]shell.Argument{},
+			[]string{},
+			loadCommand(engine),
+			func(args []string) (bool, string) {
+				return true, ""
+			},
+		),
+	)
 
-	s.RegisterCommand(shell.Command{
-		Name: "find",
-		Description: "Find a document by name or id.\n" +
-			"Display the document's id, name and path\n" +
-			"Default search field: -name\n",
-		Handler: findCommand(engine),
-		Usage:   "find <-id | -name> <value> || find <document_name>",
-	})
+	s.RegisterCommand(
+		shell.NewCommand(
+			"find",
+			"Find a document by name or id.\n"+
+				"Display the document's id, name and path\n"+
+				"Default search field: -name\n",
+			"find <-id | -name> <value> || find <document_name>",
+			[]shell.Argument{},
+			[]string{},
+			findCommand(engine),
+			func(args []string) (bool, string) {
+				return true, ""
+			},
+		),
+	)
 
-	s.RegisterEarlyExecCommand(shell.EarlyCommand{
-		Name:        "engine-stats",
-		Description: "Displays the total number of documents and keys in the engine",
-		Handler:     engineStatsCommand(engine),
-		Usage:       "engine-stats",
-	})
+	s.RegisterEarlyExecCommand(
+		shell.NewEarlyCommand(
+			"engine-stats",
+			"Displays the total number of documents and keys in the engine",
+			"engine-stats",
+			0,
+			engineStatsCommand(engine),
+		),
+	)
 }
 
 func openFile(path string) error {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/CS80-Team/Goolean/internal"
 	"os"
 	"path/filepath"
 
@@ -52,7 +53,12 @@ func main() {
 
 	engine.LoadDirectory(filepath.Join(filepath.Base("."), "dataset"))
 
-	s := shell.NewShell(os.Stdin, os.Stdout)
+	s := shell.NewShell(
+		os.Stdin,
+		os.Stdout,
+		".shell_history",
+		internal.NewLogger("shell.log"),
+	)
 
 	RegisterCommands(s, engine)
 

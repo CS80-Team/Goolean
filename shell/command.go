@@ -1,13 +1,13 @@
 package shell
 
 type Command struct {
-	Name        string
-	Description string
-	Usage       string
-	Args        []Argument
-	Aliases     []string
-	Handler     func(s *Shell, args []string) Status
-	Validator   func(args []string) (bool, string)
+	Name         string
+	Description  string
+	Usage        string
+	Args         []Argument
+	Aliases      []string
+	Handler      func(s *Shell, args []string) Status
+	ValidateArgs func(args []string) (bool, string)
 }
 
 type Argument struct {
@@ -16,7 +16,27 @@ type Argument struct {
 	Required    bool
 	Type        ArgType
 	Default     string
-	Validator   func(arg string) (bool, string)
+}
+
+func (arg *Argument) String() string {
+	//return arg.Name
+	return ""
+}
+
+func NewArgument(
+	name string,
+	description string,
+	required bool,
+	argType ArgType,
+	defaultValue string,
+) *Argument {
+	return &Argument{
+		Name:        name,
+		Description: description,
+		Required:    required,
+		Type:        argType,
+		Default:     defaultValue,
+	}
 }
 
 type ArgType string
@@ -27,4 +47,40 @@ type EarlyCommand struct {
 	Usage       string
 	Priority    int
 	Handler     func(s *Shell)
+}
+
+func NewCommand(
+	name string,
+	description string,
+	usage string,
+	args []Argument,
+	aliases []string,
+	handler func(s *Shell, args []string) Status,
+	validator func(args []string) (bool, string),
+) Command {
+	return Command{
+		Name:         name,
+		Description:  description,
+		Usage:        usage,
+		Args:         args,
+		Aliases:      aliases,
+		Handler:      handler,
+		ValidateArgs: validator,
+	}
+}
+
+func NewEarlyCommand(
+	name string,
+	description string,
+	usage string,
+	priority int, // Decide which to be displayed first (lower is first)
+	handler func(s *Shell),
+) EarlyCommand {
+	return EarlyCommand{
+		Name:        name,
+		Description: description,
+		Usage:       usage,
+		Priority:    priority,
+		Handler:     handler,
+	}
 }
