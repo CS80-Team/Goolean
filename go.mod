@@ -1,8 +1,6 @@
-module github.com/CS80-Team/BooleanEngine
+module github.com/CS80-Team/Goolean
 
-go 1.23.0
-
-toolchain go1.23.7
+go 1.24.0
 
 require (
 	github.com/chzyer/readline v1.5.1

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CS80-Team/BooleanEngine/internal/structures"
-	"github.com/CS80-Team/BooleanEngine/internal/structures/ordered"
+	"github.com/CS80-Team/Goolean/internal/structures"
+	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 )
 
 const (

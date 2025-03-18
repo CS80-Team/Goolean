@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CS80-Team/BooleanEngine/internal"
+	"github.com/CS80-Team/Goolean/internal"
 )
 
 func isLegible(ext string) bool {

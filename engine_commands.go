@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/CS80-Team/BooleanEngine/internal"
-	"github.com/CS80-Team/BooleanEngine/internal/engine"
-	"github.com/CS80-Team/BooleanEngine/shell"
+	"github.com/CS80-Team/Goolean/internal"
+	"github.com/CS80-Team/Goolean/internal/engine"
+	"github.com/CS80-Team/Goolean/shell"
 )
 
 func RegisterCommands(s *shell.Shell, engine *engine.Engine) {

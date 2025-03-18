@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/CS80-Team/BooleanEngine/internal/engine/structuresFactory"
-	"github.com/CS80-Team/BooleanEngine/internal/engine/tokenizer"
-	"github.com/CS80-Team/BooleanEngine/internal/structures/ordered"
-	"github.com/CS80-Team/BooleanEngine/internal/textprocessing"
+	"github.com/CS80-Team/Goolean/internal/engine/structuresFactory"
+	"github.com/CS80-Team/Goolean/internal/engine/tokenizer"
+	"github.com/CS80-Team/Goolean/internal/structures/ordered"
+	"github.com/CS80-Team/Goolean/internal/textprocessing"
 	"github.com/stretchr/testify/assert"
 )
 

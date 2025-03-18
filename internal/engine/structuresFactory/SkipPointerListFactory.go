@@ -1,7 +1,7 @@
 package structuresFactory
 
 import (
-	"github.com/CS80-Team/BooleanEngine/internal/structures/ordered"
+	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 	"golang.org/x/exp/constraints"
 )
 

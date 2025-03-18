@@ -2,12 +2,13 @@ package shell
 
 import (
 	"errors"
-	"github.com/chzyer/readline"
 	"io"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/chzyer/readline"
 )
 
 type Status string

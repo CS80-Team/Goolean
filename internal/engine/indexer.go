@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/CS80-Team/BooleanEngine/internal"
-	"github.com/CS80-Team/BooleanEngine/internal/engine/tokenizer"
+	"github.com/CS80-Team/Goolean/internal"
+	"github.com/CS80-Team/Goolean/internal/engine/tokenizer"
 )
 
 /*

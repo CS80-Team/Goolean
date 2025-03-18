@@ -1,11 +1,11 @@
 package engine
 
 import (
-	"github.com/CS80-Team/BooleanEngine/internal"
-	"github.com/CS80-Team/BooleanEngine/internal/structures/ordered"
+	"github.com/CS80-Team/Goolean/internal"
+	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 
-	"github.com/CS80-Team/BooleanEngine/internal/engine/tokenizer"
-	"github.com/CS80-Team/BooleanEngine/internal/textprocessing"
+	"github.com/CS80-Team/Goolean/internal/engine/tokenizer"
+	"github.com/CS80-Team/Goolean/internal/textprocessing"
 )
 
 type Engine struct {
