@@ -115,17 +115,17 @@ func (sh *Shell) autoCompleteCommand(cmd string) (string, bool) {
 	return "", false
 }
 
-//func (sh *Shell) autoCompleteArg(cmd, argPrefix string) (string, bool) {
-//	if command, ok := sh.findCommandByNameOrAlias(cmd); ok {
-//		for _, arg := range sh.commands[command.Name].Args {
-//			if strings.HasPrefix(arg.Name, argPrefix) {
-//				return arg.Name, true
-//			}
-//		}
-//	}
-//
-//	return "", false
-//}
+func (sh *Shell) autoCompleteArg(cmd, argPrefix string) (string, bool) {
+	if command, ok := sh.findCommandByNameOrAlias(cmd); ok {
+		for _, arg := range command.Args {
+			if strings.HasPrefix(arg.Name, argPrefix) {
+				return arg.Name, true
+			}
+		}
+	}
+
+	return "", false
+}
 
 func (sh *Shell) executeCommand(cmdOrAlias string, args []string) Status {
 	if strings.ToUpper(cmdOrAlias) == string(EXIT) {
@@ -209,7 +209,6 @@ func (sh *Shell) Run(welcMessage string) {
 		sh.Write("\n")
 		sh.executeEarlyCommands()
 
-		//
 		input, err := sh.inputHandler.ReadLine()
 		if err != nil {
 			if errors.Is(err, readline.ErrInterrupt) {
@@ -242,7 +241,7 @@ func (sh *Shell) Run(welcMessage string) {
 }
 
 func (sh *Shell) Exit() {
-	sh.logger.Close()
+	_ = sh.logger.Close()
 }
 
 func (sh *Shell) sortEarlyCommands() {
