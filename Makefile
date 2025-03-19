@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-APP_NAME := birs
+APP_NAME := goolean
 BIN_DIR := bin
 ENTRY_PATH := .
 

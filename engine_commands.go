@@ -262,16 +262,30 @@ func loadCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 			return shell.FAIL
 		}
 
+		lastId := engine.GetDocumentsSize()
 		engine.LoadDirectory(args[0])
+		totalLoaded := engine.GetDocumentsSize() - lastId
+
+		if totalLoaded == 0 {
+			s.Info(shell.COMMAND_PREFIX, "No documents loaded")
+		} else {
+			for i := lastId; i < engine.GetDocumentsSize(); i++ {
+				s.Write("Document: " + engine.GetDocumentByID(i).Name + " loaded\n")
+			}
+			s.Success(shell.COMMAND_PREFIX, "Loaded "+strconv.Itoa(totalLoaded)+" documents")
+		}
+
 		return shell.OK
 	}
 }
 
 func engineStatsCommand(engine *engine.Engine) func(s *shell.Shell) {
 	return func(s *shell.Shell) {
-		s.WriteColored(shell.COLOR_GREEN, "Engine stats:\n")
-		s.WriteColored(shell.COLOR_GREEN, "Total documents: "+strconv.Itoa(engine.GetDocumentsSize())+"\n")
-		s.WriteColored(shell.COLOR_GREEN, "Total keys: "+strconv.Itoa(engine.GetIndexSize())+"\n")
+		s.WriteColored(shell.COLOR_CYAN, "Engine stats:\n")
+		s.WriteColored(shell.COLOR_GREEN, "Total documents: ")
+		s.Write(strconv.Itoa(engine.GetDocumentsSize()) + "\n")
+		s.WriteColored(shell.COLOR_GREEN, "Total keys: ")
+		s.Write(strconv.Itoa(engine.GetIndexSize()) + "\n")
 	}
 }
 

@@ -383,8 +383,8 @@ func (sh *Shell) clearScreen() {
 }
 
 func (sh *Shell) addAlias(alias string, cmd string) {
-	if cm, ok := sh.commands[cmd]; ok {
-		warn := fmt.Sprintf("Alias %s already exists for command %s\n", alias, cm.Name)
+	if exsistCmd, ok := sh.rootCommand[alias]; ok {
+		warn := fmt.Sprintf("Alias %s already exists for command %s, alias overrided.", alias, sh.commands[exsistCmd].Name)
 		sh.Warn(COMMAND_PREFIX, warn)
 		sh.logger.GetLogger().Warn(warn)
 	}
