@@ -1,5 +1,13 @@
 package shell
 
+func cost(x, y byte) int {
+	if x == y {
+		return 0
+	}
+
+	return 1
+}
+
 func editDistance(a, b string) int {
 	l1 := len(a)
 	l2 := len(b)
@@ -15,13 +23,6 @@ func editDistance(a, b string) int {
 
 	for i := 0; i <= l2; i++ {
 		dp[0][i] = i
-	}
-
-	cost := func(x, y byte) int {
-		if x == y {
-			return 0
-		}
-		return 1
 	}
 
 	for i := 1; i <= l1; i++ {
