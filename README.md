@@ -71,7 +71,7 @@ Default search field: -name
    ```sh
    make build
    cd bin/
-   ./Goolean
+   ./goolean
    ```
 
 ## System Overview
@@ -79,6 +79,7 @@ Default search field: -name
 ![System Overview](https://github.com/CS80-Team/Goolean/blob/master/docs/BIRSystemOverview.png)
 
 ## Usage Example
+[![Demo video](./docs/demo.gif)](./docs/demo.mp4)
 
 ## License
 
