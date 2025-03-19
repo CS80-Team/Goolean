@@ -54,7 +54,14 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 				"Default sortby: id\n"+
 				"Default limit: all",
 			"list <-id | -name | -path | -ext> [-n <limit>] [-sortby <name | path | id | -ext>]",
-			[]shell.Argument{},
+			[]shell.Argument{ // till now for testing autoCompleteArg()
+				{Name: "-id"},
+				{Name: "-name"},
+				{Name: "-path"},
+				{Name: "-ext"},
+				{Name: "-sortby"},
+				{Name: "-n"},
+			},
 			[]string{"ls"},
 			listCommand(engine),
 			func(args []string) (bool, string) {
