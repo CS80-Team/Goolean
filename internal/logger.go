@@ -1,17 +1,14 @@
 package internal
 
 import (
+	"io"
 	"log"
 	"log/slog"
 	"os"
 )
 
-type OnClose interface {
-	Close() error
-}
-
 type Logger struct {
-	OnClose
+	io.Closer
 	logger  *slog.Logger
 	logFile *os.File
 }
