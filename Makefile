@@ -14,7 +14,7 @@ test: deps
 	go test ./... -v
 
 .PHONY: run
-run: deps
+run: fmt deps
 	@echo "Running the application..."
 	go run $(ENTRY_PATH)
 

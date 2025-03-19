@@ -92,9 +92,9 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 				"Default search field: -name\n",
 			"find <-id | -name> <value> || find <document_name>",
 			[]shell.Argument{
-                {Tag: "-id"},
-                {Tag: "-name"},
-            },
+				{Tag: "-id"},
+				{Tag: "-name"},
+			},
 			[]string{},
 			findCommand(engine),
 			func(args []string) (bool, string) {

@@ -3,7 +3,7 @@ package shell
 type ArgType string
 
 const (
-    EMPTY_TAG = ""
+	EMPTY_TAG = ""
 )
 
 type Command struct {
@@ -26,7 +26,7 @@ type EarlyCommand struct {
 
 type Argument struct {
 	Name        string
-    Tag         string // Tag is used for auto-completion
+	Tag         string // Tag is used for auto-completion
 	Description string
 	Required    bool
 	Type        ArgType
@@ -40,7 +40,7 @@ func (arg *Argument) String() string {
 
 func NewArgument(
 	name string,
-    tag string,
+	tag string,
 	description string,
 	required bool,
 	argType ArgType,
@@ -48,7 +48,7 @@ func NewArgument(
 ) *Argument {
 	return &Argument{
 		Name:        name,
-        Tag:         tag,
+		Tag:         tag,
 		Description: description,
 		Required:    required,
 		Type:        argType,
