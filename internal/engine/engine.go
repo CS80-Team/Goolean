@@ -73,7 +73,8 @@ func (e *Engine) GetIndexSize() int {
 
 func (e *Engine) GetDocumentByID(id int) *internal.Document {
 	if id < 0 && id >= len(e.docs) {
-		panic("[Engine]: Document ID out of range")
+		logger.Error(EnginePrefix, "Document ID out of range")
+		panic(EnginePrefix + "Document ID out of range")
 	}
 
 	return e.docs[id]
@@ -81,7 +82,8 @@ func (e *Engine) GetDocumentByID(id int) *internal.Document {
 
 func (e *Engine) GetDocumentByIDCopy(id int) internal.Document {
 	if id < 0 && id >= len(e.docs) {
-		panic("[Engine]: Document ID out of range")
+		logger.Error(EnginePrefix, "Document ID out of range")
+		panic(EnginePrefix + "Document ID out of range")
 	}
 
 	return internal.Document{

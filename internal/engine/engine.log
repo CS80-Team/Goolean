@@ -1,0 +1,2 @@
+time=2025-03-19T15:00:18.737+02:00 level=ERROR source=/media/omar/Programs/Projects/Go/Goolean/internal/logger.go:45 msg="[Query]: invalid query, missing operator"
+time=2025-03-19T15:00:18.737+02:00 level=ERROR source=/media/omar/Programs/Projects/Go/Goolean/internal/logger.go:45 msg="[Query]: invalid query, missing operator"

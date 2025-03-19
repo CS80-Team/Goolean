@@ -28,11 +28,26 @@ func NewLogger(logFilePath string) *Logger {
 		logger:  logger,
 		logFile: logFile,
 	}
-
 }
 
-func (l *Logger) GetLogger() *slog.Logger {
-	return l.logger
+func (l *Logger) Warn(prefix, message string, args ...any) {
+	message = prefix + message
+	l.logger.Warn(message, args...)
+}
+
+func (l *Logger) Info(prefix, message string, args ...any) {
+	message = prefix + message
+	l.logger.Info(message, args...)
+}
+
+func (l *Logger) Error(prefix, message string, args ...any) {
+	message = prefix + message
+	l.logger.Error(message, args...)
+}
+
+func (l *Logger) Debug(prefix, message string, args ...any) {
+	message = prefix + message
+	l.logger.Debug(message, args...)
 }
 
 func (l *Logger) Close() error {

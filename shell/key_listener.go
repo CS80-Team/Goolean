@@ -1,8 +1,9 @@
 package shell
 
 import (
-	"github.com/chzyer/readline"
 	"strings"
+
+	"github.com/chzyer/readline"
 )
 
 type KeyListener struct {
@@ -12,7 +13,7 @@ type KeyListener struct {
 func (l *KeyListener) OnChange(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
 	if key == readline.CharTab {
 		input := string(line)[:pos-1]
-		l.shell.logger.GetLogger().Info("Tab key pressed: " + input)
+		l.shell.logger.Info(SHELL_PREFIX, "Tab key pressed: "+input)
 
 		parts := strings.Fields(input)
 		if len(parts) == 0 {

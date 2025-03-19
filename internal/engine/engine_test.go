@@ -222,7 +222,7 @@ func TestQuery(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := e.Query(tt.query)
+			result, _ := e.Query(tt.query)
 			if tt.expected == nil {
 				assert.Nil(t, result, "Expected nil result")
 				return
@@ -252,9 +252,8 @@ func TestQuery(t *testing.T) {
 
 	for _, tt := range invalidQueriesTests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Panics(t, func() {
-				e.Query(tt.query)
-			}, "Expected panic")
+			_, err := e.Query(tt.query)
+			assert.NotNil(t, err, "Expected error")
 		})
 	}
 }

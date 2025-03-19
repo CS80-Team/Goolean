@@ -14,24 +14,29 @@ const (
 	NOT = "NOT"
 )
 
-func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
+func (e *Engine) Query(tokens []string) (ordered.OrderedStructure[int], error) {
 	var ops = structures.NewStack[string]()
 	var keys = structures.NewStack[string]()
 	var res ordered.OrderedStructure[int]
 
 	if len(tokens) == 0 {
-		return nil
+		return nil, fmt.Errorf("no query provided")
 	} else if len(tokens) == 1 {
 		// not world
 		if tokens[0] == NOT {
-			return e.complement(nil)
+			return e.complement(nil), nil
 		}
 		if tokens[0] == AND || tokens[0] == OR {
-			panic("[Engine]: Invalid query, missing operand")
+			logger.Error(QueryPrefix, "invalid query, missing operator")
+			return nil, fmt.Errorf("invalid query, missing operator")
 		}
 
 		tokenized := e.ProcessToken(tokens[0])
-		return e.indexMgr.Get(tokenized)
+		res = e.indexMgr.Get(tokenized)
+		if res == nil {
+			return nil, fmt.Errorf("no results found")
+		}
+		return res, nil
 	}
 
 	// HANDLE NOT AND NOT
@@ -54,7 +59,8 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 				if ops.Peek() == AND {
 					if res == nil {
 						if keys.GetSize() < 1 {
-							panic("[Engine]: Invalid query, missing operator")
+							logger.Error(QueryPrefix, "invalid query, missing operator")
+							return nil, fmt.Errorf("invalid query, missing operator")
 						}
 
 						if (notCount % 2) == 1 {
@@ -64,7 +70,8 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 					} else {
 						if keys.IsEmpty() {
-							panic("[Engine]: Invalid query, missing operator")
+							logger.Error(QueryPrefix, "invalid query, missing operator")
+							return nil, fmt.Errorf("invalid query, missing operator")
 						}
 
 						if (notCount % 2) == 1 {
@@ -76,7 +83,8 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 				} else {
 					if res == nil {
 						if keys.GetSize() < 1 {
-							panic("[Engine]: Invalid query, missing operator")
+							logger.Error(QueryPrefix, "invalid query, missing operator")
+							return nil, fmt.Errorf("invalid query, missing operator")
 						}
 
 						if (notCount % 2) == 1 {
@@ -86,7 +94,8 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 						}
 					} else {
 						if keys.IsEmpty() {
-							panic("[Engine]: Invalid query, missing operator")
+							logger.Error(QueryPrefix, "invalid query, missing operator")
+							return nil, fmt.Errorf("invalid query, missing operator")
 						}
 
 						if (notCount % 2) == 1 {
@@ -100,7 +109,8 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 				notCount = 0
 			} else {
 				if keys.GetSize() > 1 || (keys.GetSize() == 1 && res != nil) {
-					panic("[Engine]: Invalid query, missing operator")
+					logger.Error(QueryPrefix, "invalid query, missing operator")
+					return nil, fmt.Errorf("invalid query, missing operator")
 				}
 			}
 
@@ -129,10 +139,10 @@ func (e *Engine) Query(tokens []string) ordered.OrderedStructure[int] {
 		}
 	}
 
-	return res
+	return res, nil
 }
 
-func (e *Engine) QueryString(query string) ordered.OrderedStructure[int] {
+func (e *Engine) QueryString(query string) (ordered.OrderedStructure[int], error) {
 	return e.Query(strings.Fields(query))
 }
 

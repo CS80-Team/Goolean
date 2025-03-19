@@ -227,8 +227,8 @@ func (sh *Shell) handleCommandOrAliasNotFound(cmd string) {
 		}
 	}
 	errMsg += "type `help` for list of commands"
-	sh.Error(COMMAND_PREFIX, errMsg)
-	sh.logger.GetLogger().Error(errMsg)
+	sh.Error(SHELL_PREFIX, errMsg)
+	sh.logger.Error(SHELL_PREFIX, errMsg)
 }
 
 func (sh *Shell) getNearestCommandOrAlias(cmd string) (string, string) {
@@ -308,13 +308,13 @@ func (sh *Shell) executeCommand(cmdOrAlias string, args []string) Status {
 		ok, err := command.ValidateArgs(args)
 		if !ok {
 			sh.Error(COMMAND_PREFIX, "Invalid arguments, "+err)
-			sh.logger.GetLogger().Error(fmt.Sprintf("Invalid arguments for command %s: %s", cmdOrAlias, err))
+			sh.logger.Error(SHELL_PREFIX, fmt.Sprintf("Invalid arguments for command %s: %s", cmdOrAlias, err))
 			return FAIL
 		}
 		return command.Handler(sh, args)
 	}
 
-	sh.logger.GetLogger().Error(fmt.Sprintf("Command %s not found\n", cmdOrAlias))
+	sh.logger.Error(SHELL_PREFIX, fmt.Sprintf("Command %s not found\n", cmdOrAlias))
 	return NOT_FOUND
 }
 
@@ -386,7 +386,7 @@ func (sh *Shell) addAlias(alias string, cmd string) {
 	if exsistCmd, ok := sh.rootCommand[alias]; ok {
 		warn := fmt.Sprintf("Alias %s already exists for command %s, alias overrided.", alias, sh.commands[exsistCmd].Name)
 		sh.Warn(COMMAND_PREFIX, warn)
-		sh.logger.GetLogger().Warn(warn)
+		sh.logger.Warn(SHELL_PREFIX, warn)
 	}
 	sh.rootCommand[alias] = cmd
 }

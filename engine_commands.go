@@ -235,7 +235,11 @@ func openCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 
 func queryCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
 	return func(s *shell.Shell, args []string) shell.Status {
-		res := engine.Query(args)
+		res, err := engine.Query(args)
+
+		if err != nil {
+			s.Error(shell.COMMAND_PREFIX, err.Error())
+		}
 
 		if res == nil || res.GetLength() == 0 {
 			s.Write("No results found\n")
@@ -262,8 +266,14 @@ func loadCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 			return shell.FAIL
 		}
 
+		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
+			s.Write("Path does not exist\n")
+			return shell.FAIL
+		}
+
 		lastId := engine.GetDocumentsSize()
 		engine.LoadDirectory(args[0])
+
 		totalLoaded := engine.GetDocumentsSize() - lastId
 
 		if totalLoaded == 0 {

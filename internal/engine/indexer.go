@@ -15,12 +15,13 @@ import (
  */
 func (e *Engine) parseDocument(doc *internal.Document) {
 	if doc == nil {
-		panic("[Indexer]: Document cannot be nil")
+		logger.Error(IndexManagerPrefix, "Document cannot be nil")
+		panic(IndexManagerPrefix + "Document cannot be nil")
 	}
 
 	file, err := os.Open(doc.GetFilePath())
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "[Indexer]: Error opening file: %s\n", err)
+		logger.Error(IndexManagerPrefix, fmt.Sprintf("Error opening file %s", doc.GetFilePath()))
 		return
 	}
 
@@ -46,7 +47,8 @@ func (e *Engine) parseDocument(doc *internal.Document) {
 
 func (e *Engine) indexKey(key *string, doc *internal.Document) {
 	if key == nil {
-		panic("[Indexer]: Key cannot be nil")
+		logger.Error(IndexManagerPrefix, "Key cannot be nil")
+		panic(IndexManagerPrefix + "Key cannot be nil")
 	}
 
 	if *key == "" {
