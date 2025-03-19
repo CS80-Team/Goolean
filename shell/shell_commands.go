@@ -111,7 +111,8 @@ func (sh *Shell) registerBuiltInCommands() {
 			},
 			[]string{},
 			func(s *Shell, args []string) Status {
-				sh.addAlias(args[0], args[1])
+				cmd, _ := sh.findCommandByNameOrAlias(args[1])
+				sh.addAlias(args[0], cmd.Name)
 				return OK
 			},
 			func(args []string) (bool, string) {

@@ -1,5 +1,7 @@
 package shell
 
+type ArgType string
+
 type Command struct {
 	Name         string
 	Description  string
@@ -8,6 +10,14 @@ type Command struct {
 	Aliases      []string
 	Handler      func(s *Shell, args []string) Status
 	ValidateArgs func(args []string) (bool, string)
+}
+
+type EarlyCommand struct {
+	Name        string
+	Description string
+	Usage       string
+	Priority    int
+	Handler     func(s *Shell)
 }
 
 type Argument struct {
@@ -39,16 +49,6 @@ func NewArgument(
 	}
 }
 
-type ArgType string
-
-type EarlyCommand struct {
-	Name        string
-	Description string
-	Usage       string
-	Priority    int
-	Handler     func(s *Shell)
-}
-
 func NewCommand(
 	name string,
 	description string,
@@ -57,8 +57,8 @@ func NewCommand(
 	aliases []string,
 	handler func(s *Shell, args []string) Status,
 	validator func(args []string) (bool, string),
-) Command {
-	return Command{
+) *Command {
+	return &Command{
 		Name:         name,
 		Description:  description,
 		Usage:        usage,
@@ -83,4 +83,8 @@ func NewEarlyCommand(
 		Priority:    priority,
 		Handler:     handler,
 	}
+}
+
+func (cmd *Command) AddAlias(alias string) {
+    cmd.Aliases = append(cmd.Aliases, alias)
 }

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/CS80-Team/Goolean/internal"
 	"os"
 	"path/filepath"
+
+	"github.com/CS80-Team/Goolean/internal"
 
 	"github.com/CS80-Team/Goolean/internal/engine/structuresFactory"
 
@@ -56,6 +57,7 @@ func main() {
 	s := shell.NewShell(
 		os.Stdin,
 		os.Stdout,
+		shell.SHELL_PROMPT,
 		".shell_history",
 		internal.NewLogger("shell.log"),
 	)

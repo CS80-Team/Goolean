@@ -3,13 +3,14 @@ package shell
 import (
 	"errors"
 	"fmt"
-	"github.com/CS80-Team/Goolean/internal"
 	"io"
 	"os"
 	"os/exec"
 	"runtime"
 	"sort"
 	"strings"
+
+	"github.com/CS80-Team/Goolean/internal"
 
 	"github.com/chzyer/readline"
 )
@@ -26,11 +27,21 @@ const (
 const (
 	SHELL_PROMPT   = ">>> "
 	SHELL_PREFIX   = "[SHELL]: "
-	COMMAND_PREFIX = "[COMMAND]: "
+	COMMAND_PROMPT = "[COMMAND]: "
+)
+
+const (
+	COLOR_RED     = "\033[31m"
+	COLOR_GREEN   = "\033[32m"
+	COLOR_YELLOW  = "\033[33m"
+	COLOR_BLUE    = "\033[34m"
+	COLOR_MAGENTA = "\033[35m"
+	COLOR_CYAN    = "\033[36m"
+	COLOR_RESET   = "\033[0m"
 )
 
 type Shell struct {
-	commands          map[string]Command
+	commands          map[string]*Command
 	rootCommand       map[string]string
 	earlyExecCommands []EarlyCommand
 	inStream          io.Reader
@@ -41,12 +52,12 @@ type Shell struct {
 	logger            *internal.Logger
 }
 
-func NewShell(istream io.Reader, ostream io.Writer, historyFile string, logger *internal.Logger) *Shell {
+func NewShell(istream io.Reader, ostream io.Writer, prompt string, historyFile string, logger *internal.Logger) *Shell {
 	sh := &Shell{
-		commands:    make(map[string]Command),
+		commands:    make(map[string]*Command),
 		inStream:    istream,
 		outStream:   ostream,
-		prompt:      SHELL_PROMPT,
+		prompt:      prompt,
 		historyFile: historyFile,
 		rootCommand: make(map[string]string),
 		logger:      logger,
@@ -85,9 +96,10 @@ func (sh *Shell) addAlias(alias string, cmd string) {
 		sh.logger.GetLogger().Warn(fmt.Sprintf("Alias %s already exists for command %s\n", alias, cm.Name))
 	}
 	sh.rootCommand[alias] = cmd
+	// sh.commands[cmd].AddAlias(alias)
 }
 
-func (sh *Shell) RegisterCommand(cmd Command) {
+func (sh *Shell) RegisterCommand(cmd *Command) {
 	for _, alias := range cmd.Aliases {
 		sh.addAlias(alias, cmd.Name)
 	}
@@ -139,7 +151,7 @@ func (sh *Shell) executeCommand(cmdOrAlias string, args []string) Status {
 	if command, ok := sh.findCommandByNameOrAlias(cmdOrAlias); ok {
 		ok, err := command.ValidateArgs(args)
 		if !ok {
-			sh.Write(COMMAND_PREFIX + "Invalid arguments, " + err + "\n")
+			sh.Write(COMMAND_PROMPT + "Invalid arguments, " + err + "\n")
 			sh.logger.GetLogger().Error(fmt.Sprintf("Invalid arguments for command %s: %s", cmdOrAlias, err))
 			return FAIL
 		}
@@ -150,7 +162,7 @@ func (sh *Shell) executeCommand(cmdOrAlias string, args []string) Status {
 	return NOT_FOUND
 }
 
-func (sh *Shell) findCommandByNameOrAlias(cmdOrAlias string) (Command, bool) {
+func (sh *Shell) findCommandByNameOrAlias(cmdOrAlias string) (*Command, bool) {
 	if command, ok := sh.commands[cmdOrAlias]; ok {
 		return command, true
 	}
@@ -158,11 +170,11 @@ func (sh *Shell) findCommandByNameOrAlias(cmdOrAlias string) (Command, bool) {
 	if command, ok := sh.rootCommand[cmdOrAlias]; ok {
 		return sh.commands[command], true
 	}
-	return Command{}, false
+	return &Command{}, false
 }
 
-func (sh *Shell) GetCommands() []Command {
-	var cmds []Command
+func (sh *Shell) GetCommands() []*Command {
+	var cmds []*Command
 	for _, cmd := range sh.commands {
 		cmds = append(cmds, cmd)
 	}
@@ -192,6 +204,10 @@ func (sh *Shell) read() string {
 		}
 	}
 	return input
+}
+
+func (sh *Shell) WriteColored(color string, output string) {
+	sh.Write(color + output + COLOR_RESET)
 }
 
 func (sh *Shell) Write(output string) {
@@ -230,7 +246,7 @@ func (sh *Shell) Run(welcMessage string) {
 			if !found {
 				sh.handleCommandOrAliasNotFound(commandOrAlias)
 			} else {
-				sh.Write(SHELL_PREFIX + "Command failed, Usage: " + command.Usage + "\n")
+				sh.Write(sh.prompt + "Command failed, Usage: " + command.Usage + "\n")
 			}
 		} else if stat == NOT_FOUND {
 			sh.handleCommandOrAliasNotFound(commandOrAlias)
