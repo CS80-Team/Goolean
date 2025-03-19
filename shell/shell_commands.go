@@ -33,14 +33,15 @@ func (sh *Shell) registerBuiltInCommands() {
 			[]string{},
 			func(s *Shell, args []string) Status {
 				for _, cmd := range sh.GetCommands() {
-					sh.Write(cmd.Name + ": " + cmd.Description + "\n")
+					sh.WriteColored(COLOR_YELLOW, cmd.Name+": ")
+					sh.Write(cmd.Description + "\n")
 					sh.Write("    Aliases: ")
 					if len(cmd.Aliases) > 0 {
 						sh.Write(strings.Join(cmd.Aliases, ", ") + "\n")
 					} else {
 						sh.Write("No aliases found.\n")
 					}
-					sh.Write("    Usage: " + cmd.Usage + "\n\n")
+					sh.WriteColored(COLOR_CYAN, "    Usage: "+cmd.Usage+"\n\n")
 				}
 				return OK
 			},

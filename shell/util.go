@@ -1,5 +1,12 @@
 package shell
 
+import (
+	"io"
+	"os"
+
+	"golang.org/x/term"
+)
+
 func cost(x, y byte) int {
 	if x == y {
 		return 0
@@ -36,4 +43,11 @@ func editDistance(a, b string) int {
 	}
 
 	return dp[l1][l2]
+}
+
+func isTerminal(w io.Writer) bool {
+	if f, ok := w.(*os.File); ok {
+		return term.IsTerminal(int(f.Fd()))
+	}
+	return false
 }

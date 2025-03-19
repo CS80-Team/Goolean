@@ -7,3 +7,4 @@ dataset
 front
 .shell_history
 shell.log
+*.out
