@@ -146,13 +146,31 @@ func (sh *Shell) registerBuiltInCommands() {
 			},
 			[]string{},
 			func(s *Shell, args []string) Status {
-				cmd := exec.Command(args[0], args[1:]...)
+				var ar []string
+
+				for i := 0; i < len(args); i++ {
+					s := args[i]
+					if strings.HasPrefix(args[i], "\"") {
+						s = strings.TrimPrefix(s, "\"")
+						i++
+						for i < len(args) && !strings.HasSuffix(args[i], "\"") {
+							s += " " + args[i]
+							i++
+						}
+						if i < len(args) {
+							s += " " + strings.TrimSuffix(args[i], "\"")
+						}
+					}
+					ar = append(ar, s)
+				}
+
+				cmd := exec.Command(ar[0], ar[1:]...)
 
 				cmd.Stdout = sh.outStream
 				cmd.Stderr = sh.errStream
 				cmd.Stdin = sh.inStream
 
-                err := cmd.Run()
+				err := cmd.Run()
 
 				if err != nil {
 					sh.Write("Error executing command: " + err.Error() + "\n")
@@ -162,12 +180,12 @@ func (sh *Shell) registerBuiltInCommands() {
 				return OK
 			},
 			func(args []string) (bool, string) {
-                if len(args) < 1 {
-                    return false, "No command provided"
-                }
+				if len(args) < 1 {
+					return false, "No command provided"
+				}
 
-                return true, ""
-            },
+				return true, ""
+			},
 		),
 	)
 

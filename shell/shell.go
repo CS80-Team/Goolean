@@ -148,8 +148,10 @@ func (sh *Shell) autoCompleteCommand(cmd string) (string, bool) {
 func (sh *Shell) autoCompleteArg(cmd, argPrefix string) (string, bool) {
 	if command, ok := sh.findCommandByNameOrAlias(cmd); ok {
 		for _, arg := range command.Args {
-			if strings.HasPrefix(arg.Name, argPrefix) {
-				return arg.Name, true
+			if arg.Tag != EMPTY_TAG {
+				if strings.HasPrefix(arg.Tag, argPrefix) {
+					return arg.Tag, true
+				}
 			}
 		}
 	}

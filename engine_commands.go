@@ -55,12 +55,12 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 				"Default limit: all",
 			"list <-id | -name | -path | -ext> [-n <limit>] [-sortby <name | path | id | -ext>]",
 			[]shell.Argument{ // till now for testing autoCompleteArg()
-				{Name: "-id"},
-				{Name: "-name"},
-				{Name: "-path"},
-				{Name: "-ext"},
-				{Name: "-sortby"},
-				{Name: "-n"},
+				{Tag: "-id"},
+				{Tag: "-name"},
+				{Tag: "-path"},
+				{Tag: "-ext"},
+				{Tag: "-sortby"},
+				{Tag: "-n"},
 			},
 			[]string{"ls"},
 			listCommand(engine),
@@ -91,7 +91,10 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 				"Display the document's id, name and path\n"+
 				"Default search field: -name\n",
 			"find <-id | -name> <value> || find <document_name>",
-			[]shell.Argument{},
+			[]shell.Argument{
+                {Tag: "-id"},
+                {Tag: "-name"},
+            },
 			[]string{},
 			findCommand(engine),
 			func(args []string) (bool, string) {
