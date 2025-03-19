@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CS80-Team/Goolean/internal"
 	"github.com/chzyer/readline"
 
 	"github.com/CS80-Team/Goolean/internal/engine/structuresFactory"
@@ -12,7 +11,7 @@ import (
 	"github.com/CS80-Team/Goolean/internal/engine"
 	"github.com/CS80-Team/Goolean/internal/engine/tokenizer"
 	"github.com/CS80-Team/Goolean/internal/textprocessing"
-	"github.com/CS80-Team/Goolean/shell"
+	"github.com/CS80-Team/gshell/pkg/gshell"
 )
 
 func main() {
@@ -57,14 +56,14 @@ func main() {
 
 	stdin, stdinW := readline.NewFillableStdin(os.Stdin)
 
-	s := shell.NewShell(
+	s := gshell.NewShell(
 		stdin,
 		stdinW,
 		os.Stdout,
 		os.Stdout,
-		shell.SHELL_PROMPT,
+		gshell.SHELL_PROMPT,
 		".shell_history",
-		internal.NewLogger("shell.log"),
+		gshell.NewLogger("shell.log"),
 	)
 
 	RegisterCommands(s, engine)

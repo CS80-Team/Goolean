@@ -12,16 +12,16 @@ import (
 
 	"github.com/CS80-Team/Goolean/internal"
 	"github.com/CS80-Team/Goolean/internal/engine"
-	"github.com/CS80-Team/Goolean/shell"
+	"github.com/CS80-Team/gshell/pkg/gshell"
 )
 
-func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
+func RegisterCommands(s *gshell.Shell, engine *engine.Engine) {
 	s.RegisterCommand(
-		shell.NewCommand(
+		gshell.NewCommand(
 			"open",
 			"Open a document by ID in the default editor",
 			"open <document_id>",
-			[]shell.Argument{},
+			[]gshell.Argument{},
 			[]string{},
 			openCommand(engine),
 			func(args []string) (bool, string) {
@@ -31,11 +31,11 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 	)
 
 	s.RegisterCommand(
-		shell.NewCommand(
+		gshell.NewCommand(
 			"query",
 			"Query the engine for a keyword or a boolean expression",
 			"query <keyword> | <expression>",
-			[]shell.Argument{},
+			[]gshell.Argument{},
 			[]string{},
 			queryCommand(engine),
 			func(args []string) (bool, string) {
@@ -45,7 +45,7 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 	)
 
 	s.RegisterCommand(
-		shell.NewCommand(
+		gshell.NewCommand(
 			"list",
 			"List all documents, displayable by name or/and path or/and ID or/and extension\n"+
 				"Use -sortby to sort results by name, path, id or extension\n"+
@@ -54,7 +54,7 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 				"Default sortby: id\n"+
 				"Default limit: all",
 			"list <-id | -name | -path | -ext> [-n <limit>] [-sortby <name | path | id | -ext>]",
-			[]shell.Argument{ // till now for testing autoCompleteArg()
+			[]gshell.Argument{ // till now for testing autoCompleteArg()
 				{Tag: "-id"},
 				{Tag: "-name"},
 				{Tag: "-path"},
@@ -71,11 +71,11 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 	)
 
 	s.RegisterCommand(
-		shell.NewCommand(
+		gshell.NewCommand(
 			"load",
 			"Load a new document into the engine",
 			"load <document_path>",
-			[]shell.Argument{},
+			[]gshell.Argument{},
 			[]string{},
 			loadCommand(engine),
 			func(args []string) (bool, string) {
@@ -85,13 +85,13 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 	)
 
 	s.RegisterCommand(
-		shell.NewCommand(
+		gshell.NewCommand(
 			"find",
 			"Find a document by name or id.\n"+
 				"Display the document's id, name and path\n"+
 				"Default search field: -name\n",
 			"find <-id | -name> <value> || find <document_name>",
-			[]shell.Argument{
+			[]gshell.Argument{
 				{Tag: "-id"},
 				{Tag: "-name"},
 			},
@@ -104,7 +104,7 @@ func RegisterCommands(s *shell.Shell, engine *engine.Engine) {
 	)
 
 	s.RegisterEarlyExecCommand(
-		shell.NewEarlyCommand(
+		gshell.NewEarlyCommand(
 			"engine-stats",
 			"Displays the total number of documents and keys in the engine",
 			"engine-stats",
@@ -174,18 +174,18 @@ func getDocumentByField(engine *engine.Engine, search, value string) (internal.D
 	return doc, ""
 }
 
-func findCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
-	return func(s *shell.Shell, args []string) shell.Status {
+func findCommand(engine *engine.Engine) func(s *gshell.Shell, args []string) gshell.Status {
+	return func(s *gshell.Shell, args []string) gshell.Status {
 		var doc internal.Document
 		if len(args) > 2 {
 			s.Write("Invalid number of arguments\n")
-			return shell.FAIL
+			return gshell.FAIL
 		}
 
 		if len(args) == 1 {
 			if args[0] == "-id" || args[0] == "-name" {
 				s.Write("Missing value for search field\n")
-				return shell.FAIL
+				return gshell.FAIL
 			}
 			doc = engine.GetDocumentByNameCopy(args[0])
 
@@ -194,7 +194,7 @@ func findCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 			doc, err = getDocumentByField(engine, args[0], args[1])
 			if err != "" {
 				s.Write(err)
-				return shell.FAIL
+				return gshell.FAIL
 			}
 		}
 
@@ -204,20 +204,20 @@ func findCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 			s.Write("Document found:\n" + doc.String())
 		}
 
-		return shell.OK
+		return gshell.OK
 	}
 }
 
-func openCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
-	return func(s *shell.Shell, args []string) shell.Status {
+func openCommand(engine *engine.Engine) func(s *gshell.Shell, args []string) gshell.Status {
+	return func(s *gshell.Shell, args []string) gshell.Status {
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
 			s.Write("Invalid document ID\n")
-			return shell.FAIL
+			return gshell.FAIL
 		}
 		if id < 0 || id >= len(engine.GetDocuments()) {
 			s.Write("Document ID out of range, Docs Ids [0, " + strconv.Itoa(len(engine.GetDocuments())-1) + "]\n")
-			return shell.FAIL
+			return gshell.FAIL
 		}
 		doc := engine.GetDocumentByID(id)
 		path := filepath.Join(doc.DirectoryPath, doc.Name+doc.Ext)
@@ -226,24 +226,24 @@ func openCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 		if err != nil {
 			s.Write("Error opening file\n")
 			s.Write(err.Error())
-			return shell.FAIL
+			return gshell.FAIL
 		}
 
-		return shell.OK
+		return gshell.OK
 	}
 }
 
-func queryCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
-	return func(s *shell.Shell, args []string) shell.Status {
+func queryCommand(engine *engine.Engine) func(s *gshell.Shell, args []string) gshell.Status {
+	return func(s *gshell.Shell, args []string) gshell.Status {
 		res, err := engine.Query(args)
 
 		if err != nil {
-			s.Error(shell.COMMAND_PREFIX, err.Error())
+			s.Error(gshell.COMMAND_PREFIX, err.Error())
 		}
 
 		if res == nil || res.GetLength() == 0 {
 			s.Write("No results found\n")
-			return shell.OK
+			return gshell.OK
 		}
 
 		for i := 0; i < res.GetLength(); i++ {
@@ -255,20 +255,20 @@ func queryCommand(engine *engine.Engine) func(s *shell.Shell, args []string) she
 
 		s.Write("Total documents found: " + strconv.Itoa(res.GetLength()) + "\n")
 
-		return shell.OK
+		return gshell.OK
 	}
 }
 
-func loadCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
-	return func(s *shell.Shell, args []string) shell.Status {
+func loadCommand(engine *engine.Engine) func(s *gshell.Shell, args []string) gshell.Status {
+	return func(s *gshell.Shell, args []string) gshell.Status {
 		if len(args) != 1 {
 			s.Write("Invalid number of arguments\n")
-			return shell.FAIL
+			return gshell.FAIL
 		}
 
 		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
 			s.Write("Path does not exist\n")
-			return shell.FAIL
+			return gshell.FAIL
 		}
 
 		lastId := engine.GetDocumentsSize()
@@ -277,34 +277,34 @@ func loadCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 		totalLoaded := engine.GetDocumentsSize() - lastId
 
 		if totalLoaded == 0 {
-			s.Info(shell.COMMAND_PREFIX, "No documents loaded")
+			s.Info(gshell.COMMAND_PREFIX, "No documents loaded")
 		} else {
 			for i := lastId; i < engine.GetDocumentsSize(); i++ {
 				s.Write("Document: " + engine.GetDocumentByID(i).Name + " loaded\n")
 			}
-			s.Success(shell.COMMAND_PREFIX, "Loaded "+strconv.Itoa(totalLoaded)+" documents")
+			s.Success(gshell.COMMAND_PREFIX, "Loaded "+strconv.Itoa(totalLoaded)+" documents")
 		}
 
-		return shell.OK
+		return gshell.OK
 	}
 }
 
-func engineStatsCommand(engine *engine.Engine) func(s *shell.Shell) {
-	return func(s *shell.Shell) {
-		s.WriteColored(shell.COLOR_CYAN, "Engine stats:\n")
-		s.WriteColored(shell.COLOR_GREEN, "Total documents: ")
+func engineStatsCommand(engine *engine.Engine) func(s *gshell.Shell) {
+	return func(s *gshell.Shell) {
+		s.WriteColored(gshell.COLOR_CYAN, "Engine stats:\n")
+		s.WriteColored(gshell.COLOR_GREEN, "Total documents: ")
 		s.Write(strconv.Itoa(engine.GetDocumentsSize()) + "\n")
-		s.WriteColored(shell.COLOR_GREEN, "Total keys: ")
+		s.WriteColored(gshell.COLOR_GREEN, "Total keys: ")
 		s.Write(strconv.Itoa(engine.GetIndexSize()) + "\n")
 	}
 }
 
-func listCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shell.Status {
-	return func(s *shell.Shell, args []string) shell.Status {
+func listCommand(engine *engine.Engine) func(s *gshell.Shell, args []string) gshell.Status {
+	return func(s *gshell.Shell, args []string) gshell.Status {
 		displayFields, limit, sortby, err := parseListArgs(args)
 		if err != "" {
 			s.Write(err + "\n")
-			return shell.FAIL
+			return gshell.FAIL
 		}
 
 		docs := getSortedDocuments(engine, sortby)
@@ -313,7 +313,7 @@ func listCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 		}
 
 		displayDocuments(s, docs, displayFields, limit, sortby)
-		return shell.OK
+		return gshell.OK
 	}
 }
 
@@ -394,7 +394,7 @@ func getSortedDocuments(engine *engine.Engine, sortby string) []*internal.Docume
 	return docs
 }
 
-func displayDocuments(s *shell.Shell, docs []*internal.Document, displayFields []string, limit int, sortby string) {
+func displayDocuments(s *gshell.Shell, docs []*internal.Document, displayFields []string, limit int, sortby string) {
 	for i := 0; i < limit; i++ {
 		for _, field := range displayFields {
 			switch field {
