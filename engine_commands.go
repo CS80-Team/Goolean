@@ -267,8 +267,8 @@ func loadCommand(engine *engine.Engine) func(s *shell.Shell, args []string) shel
 func engineStatsCommand(engine *engine.Engine) func(s *shell.Shell) {
 	return func(s *shell.Shell) {
 		s.WriteColored(shell.COLOR_GREEN, "Engine stats:\n")
-		s.WriteColored(shell.COLOR_GREEN, "Total documents: " + strconv.Itoa(engine.GetDocumentsSize()) + "\n")
-		s.WriteColored(shell.COLOR_GREEN, "Total keys: " + strconv.Itoa(engine.GetIndexSize()) + "\n")
+		s.WriteColored(shell.COLOR_GREEN, "Total documents: "+strconv.Itoa(engine.GetDocumentsSize())+"\n")
+		s.WriteColored(shell.COLOR_GREEN, "Total keys: "+strconv.Itoa(engine.GetIndexSize())+"\n")
 	}
 }
 

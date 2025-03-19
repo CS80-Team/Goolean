@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/CS80-Team/Goolean/internal"
+	"github.com/chzyer/readline"
 
 	"github.com/CS80-Team/Goolean/internal/engine/structuresFactory"
 
@@ -54,8 +55,12 @@ func main() {
 
 	engine.LoadDirectory(filepath.Join(filepath.Base("."), "dataset"))
 
+	stdin, stdinW := readline.NewFillableStdin(os.Stdin)
+
 	s := shell.NewShell(
-		os.Stdin,
+		stdin,
+		stdinW,
+		os.Stdout,
 		os.Stdout,
 		shell.SHELL_PROMPT,
 		".shell_history",

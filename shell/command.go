@@ -86,5 +86,5 @@ func NewEarlyCommand(
 }
 
 func (cmd *Command) AddAlias(alias string) {
-    cmd.Aliases = append(cmd.Aliases, alias)
+	cmd.Aliases = append(cmd.Aliases, alias)
 }

@@ -1,6 +1,8 @@
 package shell
 
 import (
+	"io"
+
 	"github.com/chzyer/readline"
 )
 
@@ -11,7 +13,15 @@ type InputHandler struct {
 	listener    *KeyListener
 }
 
-func NewInputHandler(prompt, historyFile string, listener *KeyListener) (*InputHandler, error) {
+func NewInputHandler(
+	prompt,
+	historyFile string,
+	listener *KeyListener,
+	stdin io.ReadCloser,
+	stdinWriter io.Writer,
+	stdout io.Writer,
+	stderr io.Writer,
+) (*InputHandler, error) {
 	config := &readline.Config{
 		Prompt:            prompt,
 		HistoryFile:       historyFile,
@@ -19,6 +29,10 @@ func NewInputHandler(prompt, historyFile string, listener *KeyListener) (*InputH
 		EOFPrompt:         "exit",
 		HistorySearchFold: true,
 		Listener:          listener,
+		Stdin:             stdin,
+		StdinWriter:       stdinWriter,
+		Stdout:            stdout,
+		Stderr:            stderr,
 	}
 
 	rl, err := readline.NewEx(config)

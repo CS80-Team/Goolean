@@ -44,15 +44,25 @@ type Shell struct {
 	commands          map[string]*Command
 	rootCommand       map[string]string
 	earlyExecCommands []EarlyCommand
-	inStream          io.Reader
+	inStream          io.ReadCloser
+	inStreamWriter    io.Writer
 	outStream         io.Writer
+	errStream         io.Writer
 	inputHandler      *InputHandler
 	prompt            string
 	historyFile       string
 	logger            *internal.Logger
 }
 
-func NewShell(istream io.Reader, ostream io.Writer, prompt string, historyFile string, logger *internal.Logger) *Shell {
+func NewShell(
+	istream io.ReadCloser,
+	inStreamWriter io.Writer,
+	ostream io.Writer,
+	errStream io.Writer,
+	prompt string,
+	historyFile string,
+	logger *internal.Logger,
+) *Shell {
 	sh := &Shell{
 		commands:    make(map[string]*Command),
 		inStream:    istream,
@@ -63,9 +73,17 @@ func NewShell(istream io.Reader, ostream io.Writer, prompt string, historyFile s
 		logger:      logger,
 	}
 
-	// Initialize the InputHandler
 	listener := &KeyListener{shell: sh}
-	inputHandler, err := NewInputHandler(sh.prompt, sh.historyFile, listener)
+	inputHandler, err := NewInputHandler(
+		prompt,
+		historyFile,
+		listener,
+		istream,
+		inStreamWriter,
+		ostream,
+		ostream,
+	)
+
 	if err != nil {
 		panic(err)
 	}
@@ -181,12 +199,20 @@ func (sh *Shell) GetCommands() []*Command {
 	return cmds
 }
 
-func (sh *Shell) SetInputStream(in io.Reader) {
+func (sh *Shell) SetInputStream(in io.ReadCloser) {
 	sh.inStream = in
+}
+
+func (sh *Shell) SetInputStreamWriter(in io.Writer) {
+	sh.inStreamWriter = in
 }
 
 func (sh *Shell) SetOutputStream(out io.Writer) {
 	sh.outStream = out
+}
+
+func (sh *Shell) SetErrorStream(err io.Writer) {
+	sh.errStream = err
 }
 
 func (sh *Shell) read() string {
@@ -214,9 +240,27 @@ func (sh *Shell) Write(output string) {
 	_, _ = sh.outStream.Write([]byte(output))
 }
 
-func (sh *Shell) Run(welcMessage string) {
-	var stat Status
+func (sh *Shell) execute(input *string) Status {
+	commandOrAlias, args := sh.parseInput(input)
 
+	switch sh.executeCommand(commandOrAlias, args) {
+	case EXIT:
+		return EXIT
+	case FAIL:
+		command, found := sh.findCommandByNameOrAlias(commandOrAlias)
+		if !found {
+			sh.handleCommandOrAliasNotFound(commandOrAlias)
+		} else {
+			sh.Write(sh.prompt + "Command failed, Usage: " + command.Usage + "\n")
+		}
+	case NOT_FOUND:
+		sh.handleCommandOrAliasNotFound(commandOrAlias)
+	}
+
+	return OK
+}
+
+func (sh *Shell) Run(welcMessage string) {
 	sh.clearScreen()
 	sh.Write(welcMessage)
 	sh.sortEarlyCommands()
@@ -232,24 +276,16 @@ func (sh *Shell) Run(welcMessage string) {
 				continue
 			}
 
+			if errors.Is(err, io.EOF) { // Ctrl+D to exit
+				break
+			}
+
 			sh.Write("Error reading input: " + err.Error() + "\n")
 			continue
 		}
 
-		commandOrAlias, args := sh.parseInput(input)
-		stat = sh.executeCommand(commandOrAlias, args)
-
-		if stat == EXIT {
+		if sh.execute(&input) == EXIT {
 			break
-		} else if stat == FAIL {
-			command, found := sh.findCommandByNameOrAlias(commandOrAlias)
-			if !found {
-				sh.handleCommandOrAliasNotFound(commandOrAlias)
-			} else {
-				sh.Write(sh.prompt + "Command failed, Usage: " + command.Usage + "\n")
-			}
-		} else if stat == NOT_FOUND {
-			sh.handleCommandOrAliasNotFound(commandOrAlias)
 		}
 	}
 
@@ -258,6 +294,8 @@ func (sh *Shell) Run(welcMessage string) {
 
 func (sh *Shell) Exit() {
 	_ = sh.logger.Close()
+	sh.inputHandler.Close()
+	sh.inStream.Close()
 }
 
 func (sh *Shell) sortEarlyCommands() {
@@ -309,8 +347,8 @@ func (sh *Shell) getNearestCommandOrAlias(cmd string) (string, string) {
 	return nearestCmd, matchedAlias
 }
 
-func (sh *Shell) parseInput(input string) (string, []string) {
-	tokens := strings.Fields(input)
+func (sh *Shell) parseInput(input *string) (string, []string) {
+	tokens := strings.Fields(*input)
 	if len(tokens) == 0 {
 		return "", nil
 	}

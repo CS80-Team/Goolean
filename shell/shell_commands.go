@@ -2,6 +2,8 @@ package shell
 
 import (
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -92,7 +94,7 @@ func (sh *Shell) registerBuiltInCommands() {
 		NewCommand(
 			"alias",
 			"Create an alias for a command",
-			"alias <Alias> <Command>",
+			"alias <alias> <command>",
 			[]Argument{
 				{
 					Name:        "Alias",
@@ -123,6 +125,92 @@ func (sh *Shell) registerBuiltInCommands() {
 				if _, ok := sh.findCommandByNameOrAlias(args[1]); !ok {
 					return false, "Command or alias not found"
 				}
+				return true, ""
+			},
+		),
+	)
+
+	sh.RegisterCommand(
+		NewCommand(
+			"exec",
+			"Execute a an external command",
+			"exec <command>",
+			[]Argument{
+				{
+					Name:        "Execute command",
+					Description: "The command to execute",
+					Required:    true,
+					Type:        "string",
+					Default:     "",
+				},
+			},
+			[]string{},
+			func(s *Shell, args []string) Status {
+				cmd := exec.Command(args[0], args[1:]...)
+
+				cmd.Stdout = sh.outStream
+				cmd.Stderr = sh.errStream
+				cmd.Stdin = sh.inStream
+
+                err := cmd.Run()
+
+				if err != nil {
+					sh.Write("Error executing command: " + err.Error() + "\n")
+					return FAIL
+				}
+
+				return OK
+			},
+			func(args []string) (bool, string) {
+                if len(args) < 1 {
+                    return false, "No command provided"
+                }
+
+                return true, ""
+            },
+		),
+	)
+
+	sh.RegisterCommand(
+		NewCommand(
+			"run",
+			"Run a script",
+			"run <script_path.shell>",
+			[]Argument{
+				{
+					Name:        "Script Path",
+					Description: "The path to the script to run",
+					Required:    true,
+					Type:        "string",
+					Default:     "",
+				},
+			},
+			[]string{},
+			func(s *Shell, args []string) Status {
+				file, err := os.ReadFile(args[0])
+				if err != nil {
+					sh.Write("Error reading script file: " + err.Error() + "\n")
+					return FAIL
+				}
+
+				lines := strings.Split(string(file), "\n")
+				for _, line := range lines {
+					sh.execute(&line)
+				}
+
+				return OK
+			},
+			func(args []string) (bool, string) {
+				if len(args) != 1 {
+					return false, "Invalid number of arguments"
+				}
+
+				if info, err := os.Stat(args[0]); os.IsNotExist(err) {
+					return false, "File not found"
+				} else if info.IsDir() || filepath.Ext(args[0]) != ".shell" {
+					return false, "Invalid file type"
+				}
+
 				return true, ""
 			},
 		),
