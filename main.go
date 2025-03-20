@@ -68,5 +68,5 @@ func main() {
 
 	RegisterCommands(s, engine)
 
-	s.Run("Welcome to the Boolean IR System shell, type `help` for list of commands\n")
+	s.Run("Welcome to the Goolean search engine shell, type `help` for list of commands\n")
 }
