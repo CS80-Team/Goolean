@@ -82,6 +82,7 @@ Default search field: -name
 [![Demo video](./docs/demo.gif)](./docs/demo.mp4)
 
 ## License
+![MIT License](LICENSE)
 
 ## Contributors
 
