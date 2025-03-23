@@ -5,7 +5,6 @@
 *.out
 *.shell_history
 *.log
-*.pb.*
 
 bin
 dataset
