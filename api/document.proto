@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package api.model;
+
+option go_package = "github.com/CS80-Team/Goolean/internal/transport";
+
+message Document {
+  int32 id = 1;
+  string name = 2;
+  string path = 3;
+  string ext = 4;
+}

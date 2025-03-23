@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package api.query;
+
+option go_package = "github.com/CS80-Team/Goolean/internal/transport/query";
+
+import "api/document.proto";
+
+service Query {
+  rpc Query(QueryRequest) returns (QueryResponse);
+}
+
+message QueryRequest {
+  string queryLine = 1;
+}
+
+message QueryResponse {
+  repeated api.model.Document documents = 1;
+}

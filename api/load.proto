@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package api.load;
+
+option go_package = "github.com/CS80-Team/Goolean/internal/transport/load";
+
+import "api/document.proto";
+
+service Load {
+  rpc Load(LoadRequest) returns (LoadResponse);
+}
+
+message LoadRequest {
+  repeated api.model.Document documents = 1;
+}
+
+message LoadResponse {}
