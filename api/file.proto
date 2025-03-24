@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package api.file;
+
+option go_package = "github.com/CS80-Team/Goolean/internal/transport/file";
+
+service FileService {
+    rpc UploadFile(stream File) returns (FileStatus);
+    rpc DownloadFile(DocumentID) returns (File);
+}
+
+message DocumentID {
+    string id = 1;
+}
+
+message FileStatus {
+    string status = 1;
+    string message = 2;
+}
+
+message File {
+    string name = 1;
+    repeated Chunk chunks = 2;
+    string ext = 3;
+
+    message Chunk {
+        int32 id = 1;
+        bytes data = 2;
+    }
+}

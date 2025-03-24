@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/CS80-Team/Goolean/internal/dto"
 	"github.com/CS80-Team/Goolean/internal/engine"
@@ -21,6 +22,8 @@ func NewLoadServer(engine *engine.Engine) *LoadServer {
 
 // TODO: Send a whole file and load it into the engine, instead of local
 func (qs *LoadServer) Load(ctx context.Context, request *pb.LoadRequest) (*pb.LoadResponse, error) {
+	log.Printf("New load request with %d documents", len(request.Documents))
+
 	for _, doc := range request.Documents {
 		qs.engine.AddDocument(dto.MapGRPCDocumentToEngineDocument(doc))
 	}

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/CS80-Team/Goolean/internal/service"
+	"github.com/CS80-Team/Goolean/internal/transport/file"
 	"github.com/CS80-Team/Goolean/internal/transport/load"
 	"github.com/CS80-Team/Goolean/internal/transport/query"
 	"github.com/CS80-Team/gshell/pkg/gshell"
@@ -104,10 +105,12 @@ func startService(ipPort *string, engine *engine.Engine) {
 	grpcServer := grpc.NewServer()
 	loadServer := service.NewLoadServer(engine)
 	queryServer := service.NewQueryServer(engine)
+	fileServer := service.NewFileServer("recivedFiles", engine)
 
 	reflection.Register(grpcServer)
 	load.RegisterLoadServer(grpcServer, loadServer)
 	query.RegisterQueryServer(grpcServer, queryServer)
+	file.RegisterFileServiceServer(grpcServer, fileServer)
 
 	log.Println("Starting server...")
 	_ = grpcServer.Serve(lis)

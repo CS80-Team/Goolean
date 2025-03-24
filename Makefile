@@ -2,6 +2,7 @@ SHELL := /bin/bash
 APP_NAME := goolean
 BIN_DIR := bin
 ENTRY_PATH := .
+PROTO_FILES = api/document.proto api/query.proto api/load.proto api/file.proto
 
 .PHONY: deps
 deps:
@@ -27,9 +28,7 @@ proto:
 	--go_opt=module=github.com/CS80-Team/Goolean \
 	--go-grpc_out=. \
 	--go-grpc_opt=module=github.com/CS80-Team/Goolean \
-	api/document.proto \
-	api/query.proto \
-	api/load.proto
+	$(PROTO_FILES)
 
 
 .PHONY: build

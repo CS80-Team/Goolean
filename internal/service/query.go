@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/CS80-Team/Goolean/internal/dto"
 	"github.com/CS80-Team/Goolean/internal/engine"
@@ -25,6 +26,9 @@ func NewQueryServer(engine *engine.Engine) *QueryServer {
 
 func (qs *QueryServer) Query(ctx context.Context, request *pb.QueryRequest) (*pb.QueryResponse, error) {
 	queryLine := request.QueryLine
+
+	log.Printf("New query: %s", queryLine)
+
 	res, err := qs.engine.QueryString(queryLine)
 
 	if res == nil {
