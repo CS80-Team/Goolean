@@ -64,7 +64,7 @@ func main() {
 				'^': {},
 			},
 		),
-		*engine.NewIndexManager(factory.NewOrderedSliceFactory[int]()),
+		*engine.NewIndexManager(factory.NewSkipPointerListFactory[int]()),
 	)
 
 	engine.LoadDirectory(filepath.Join(filepath.Base("."), "dataset"))

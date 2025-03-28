@@ -4,6 +4,10 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
+var _ OrderedStructure[int] = &OrderedSlice[int]{}
+var _ SearchableOrderedSet[int] = &OrderedSlice[int]{}
+var _ SetOperations[int] = &OrderedSlice[int]{}
+
 type OrderedSlice[Entry constraints.Integer] struct {
 	data []Entry
 }
@@ -161,13 +165,32 @@ func (s1 *OrderedSlice[Entry]) Union(s2 OrderedStructure[Entry]) OrderedStructur
 
 	var res = NewOrderedSlice[Entry]()
 
-	for i := range s1.GetLength() {
-		res.InsertSorted(s1.At(i))
+	var i = 0
+	var j = 0
+
+	for i < s1.GetLength() && j < s2.GetLength() {
+		if s1.At(i) == s2.At(j) {
+            res.InsertSorted(s1.At(i))
+            i++
+            j++
+        } else if s1.At(i) < s2.At(j) {
+            res.InsertSorted(s1.At(i))
+            i++
+        } else {
+            res.InsertSorted(s2.At(j))
+            j++
+        }
 	}
 
-	for i := range s2.GetLength() {
-		res.InsertSorted(s2.At(i))
-	}
+    for i < s1.GetLength() {
+        res.InsertSorted(s1.At(i))
+        i++
+    }
+
+    for j < s2.GetLength() {
+        res.InsertSorted(s2.At(j))
+        j++
+    }
 
 	return res
 }
