@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"fmt"
+
 	"github.com/CS80-Team/Goolean/internal/structures/factory"
 	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 )
@@ -37,7 +39,7 @@ func (idx *IndexManager) PutSlice(key string, values []int) {
 
 func (idx *IndexManager) Get(key string) ordered.OrderedStructure[int] {
 	if _, ok := idx.index[key]; !ok {
-		logger.Warn("Key %s not found in index", key)
+		logger.Warn(IndexManagerPrefix, fmt.Sprintf("Key %s not found in index", key))
 		return idx.factory.New()
 	}
 	return idx.index[key]
