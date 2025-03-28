@@ -11,3 +11,10 @@ bin
 dataset
 front
 recivedFiles
+
+# remove benchmark files
+benchmark
+*.prof
+*.profraw
+queries.txt
+*.test
