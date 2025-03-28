@@ -109,22 +109,22 @@ func (o *OrderedSlice[Entry]) IsEmpty() bool {
 func (s *OrderedSlice[Entry]) Complement(maxDocId int) OrderedStructure[Entry] {
 	var res = NewOrderedSlice[Entry]()
 
-    var i, j = 0, 0
-    for i < s.GetLength() && j <= maxDocId {
-        if s.At(i) == Entry(j) {
-            i++
-        } else {
-            res.InsertSorted(Entry(j))
-        }
-        j++
-    }
+	var i, j = 0, 0
+	for i < s.GetLength() && j <= maxDocId {
+		if s.At(i) == Entry(j) {
+			i++
+		} else {
+			res.InsertSorted(Entry(j))
+		}
+		j++
+	}
 
-    for j <= maxDocId {
-        res.InsertSorted(Entry(j))
-        j++
-    }
+	for j <= maxDocId {
+		res.InsertSorted(Entry(j))
+		j++
+	}
 
-    return res
+	return res
 }
 
 func (s1 *OrderedSlice[Entry]) Intersection(s2 OrderedStructure[Entry]) OrderedStructure[Entry] {
