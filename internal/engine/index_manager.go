@@ -1,16 +1,16 @@
 package engine
 
 import (
-	"github.com/CS80-Team/Goolean/internal/engine/structuresFactory"
+	"github.com/CS80-Team/Goolean/internal/structures/factory"
 	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 )
 
 type IndexManager struct {
 	index   map[string]ordered.OrderedStructure[int]
-	factory structuresFactory.StructuresFactory[int]
+	factory factory.StructuresFactory[int]
 }
 
-func NewIndexManager(fa structuresFactory.StructuresFactory[int]) *IndexManager {
+func NewIndexManager(fa factory.StructuresFactory[int]) *IndexManager {
 	return &IndexManager{
 		index:   make(map[string]ordered.OrderedStructure[int]),
 		factory: fa,

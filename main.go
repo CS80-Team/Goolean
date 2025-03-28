@@ -8,15 +8,13 @@ import (
 	"path/filepath"
 
 	"github.com/CS80-Team/Goolean/internal/service"
+	"github.com/CS80-Team/Goolean/internal/structures/factory"
 	"github.com/CS80-Team/Goolean/internal/transport/file"
-	"github.com/CS80-Team/Goolean/internal/transport/load"
 	"github.com/CS80-Team/Goolean/internal/transport/query"
 	"github.com/CS80-Team/gshell/pkg/gshell"
 	"github.com/chzyer/readline"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-
-	"github.com/CS80-Team/Goolean/internal/engine/structuresFactory"
 
 	"github.com/CS80-Team/Goolean/internal/engine"
 	"github.com/CS80-Team/Goolean/internal/engine/tokenizer"
@@ -66,7 +64,7 @@ func main() {
 				'^': {},
 			},
 		),
-		*engine.NewIndexManager(structuresFactory.NewOrderedSliceFactory[int]()),
+		*engine.NewIndexManager(factory.NewOrderedSliceFactory[int]()),
 	)
 
 	engine.LoadDirectory(filepath.Join(filepath.Base("."), "dataset"))
@@ -103,12 +101,10 @@ func startService(ipPort *string, engine *engine.Engine) {
 	}
 
 	grpcServer := grpc.NewServer()
-	loadServer := service.NewLoadServer(engine)
 	queryServer := service.NewQueryServer(engine)
 	fileServer := service.NewFileServer("recivedFiles", engine)
 
 	reflection.Register(grpcServer)
-	load.RegisterLoadServer(grpcServer, loadServer)
 	query.RegisterQueryServer(grpcServer, queryServer)
 	file.RegisterFileServiceServer(grpcServer, fileServer)
 

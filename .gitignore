@@ -5,8 +5,9 @@
 *.out
 *.shell_history
 *.log
+.qodo
 
 bin
 dataset
 front
-.qodo
+recivedFiles

@@ -1,9 +1,11 @@
-package structuresFactory
+package factory
 
 import (
 	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 	"golang.org/x/exp/constraints"
 )
+
+var _ StructuresFactory[int] = &OrderedSliceFactory[int]{}
 
 type OrderedSliceFactory[Entry constraints.Ordered] struct {
 }

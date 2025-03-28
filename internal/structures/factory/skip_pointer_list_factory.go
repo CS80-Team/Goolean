@@ -1,9 +1,11 @@
-package structuresFactory
+package factory
 
 import (
 	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 	"golang.org/x/exp/constraints"
 )
+
+var _ StructuresFactory[int] = &SkipPointerListFactory[int]{}
 
 type SkipPointerListFactory[Entry constraints.Ordered] struct {
 }

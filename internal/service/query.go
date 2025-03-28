@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/CS80-Team/Goolean/internal/dto"
 	"github.com/CS80-Team/Goolean/internal/engine"
+	"github.com/CS80-Team/Goolean/internal/service/dto"
 	"github.com/CS80-Team/Goolean/internal/transport"
 	pb "github.com/CS80-Team/Goolean/internal/transport/query"
 )
@@ -20,9 +20,6 @@ func NewQueryServer(engine *engine.Engine) *QueryServer {
 		engine: engine,
 	}
 }
-
-// engine document to grpc document
-// grpc document to engine document
 
 func (qs *QueryServer) Query(ctx context.Context, request *pb.QueryRequest) (*pb.QueryResponse, error) {
 	queryLine := request.QueryLine

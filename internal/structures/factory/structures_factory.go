@@ -1,4 +1,4 @@
-package structuresFactory
+package factory
 
 import (
 	"github.com/CS80-Team/Goolean/internal/structures/ordered"

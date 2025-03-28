@@ -12,6 +12,9 @@ type SkipNode[Entry constraints.Ordered] struct {
 	skip  *SkipNode[Entry]
 }
 
+
+var _ OrderedStructure[int] = &SkipPointerList[int]{}
+
 type SkipPointerList[Entry constraints.Ordered] struct {
 	head *SkipNode[Entry]
 	size int

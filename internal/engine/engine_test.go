@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/CS80-Team/Goolean/internal/engine/structuresFactory"
+	"github.com/CS80-Team/Goolean/internal/structures/factory"
 	"github.com/CS80-Team/Goolean/internal/engine/tokenizer"
 	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 	"github.com/CS80-Team/Goolean/internal/textprocessing"
@@ -32,7 +32,7 @@ var (
 		&tokens,
 	)
 
-	indexManager = NewIndexManager(structuresFactory.NewOrderedSliceFactory[int]())
+	indexManager = NewIndexManager(factory.NewOrderedSliceFactory[int]())
 
 	ahmed = processor.Process("ahmed")
 	omar  = processor.Process("omar")
