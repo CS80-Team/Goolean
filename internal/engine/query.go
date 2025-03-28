@@ -24,7 +24,7 @@ func (e *Engine) Query(tokens []string) (ordered.OrderedStructure[int], error) {
 	} else if len(tokens) == 1 {
 		// not world
 		if tokens[0] == NOT {
-			return e.complement(nil), nil
+			return e.complement(e.indexMgr.Get("")), nil
 		}
 		if tokens[0] == AND || tokens[0] == OR {
 			logger.Error(QueryPrefix, "invalid query, missing operator")
@@ -33,9 +33,6 @@ func (e *Engine) Query(tokens []string) (ordered.OrderedStructure[int], error) {
 
 		tokenized := e.ProcessToken(tokens[0])
 		res = e.indexMgr.Get(tokenized)
-		if res == nil {
-			return nil, fmt.Errorf("no results found")
-		}
 		return res, nil
 	}
 
@@ -130,10 +127,9 @@ func (e *Engine) Query(tokens []string) (ordered.OrderedStructure[int], error) {
 	}
 
 	if !ops.IsEmpty() && ops.Peek() == NOT {
-		fmt.Println("Complement")
 		ops.Pop()
 		if res == nil {
-			res = e.complement(nil)
+			res = e.complement(e.indexMgr.Get(""))
 		} else {
 			res = e.complement(res)
 		}
@@ -147,74 +143,13 @@ func (e *Engine) QueryString(query string) (ordered.OrderedStructure[int], error
 }
 
 func (e *Engine) complement(s ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
-	var res = e.indexMgr.factory.New()
-	if s == nil {
-		for i := 0; i < e.GetDocumentsSize(); i++ {
-			res.InsertSorted(i)
-		}
-		return res
-	}
-
-	j := 0
-	i := 0
-	for j < s.GetLength() {
-		if i == s.At(j) {
-			j++
-		} else {
-			res.InsertSorted(i)
-		}
-		i++
-	}
-
-	for i < e.GetDocumentsSize() {
-		res.InsertSorted(i)
-		i++
-	}
-
-	return res
+	return s.Complement(e.GetDocumentsSize() - 1)
 }
 
 func (e *Engine) intersection(s1, s2 ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
-	if s1 == nil || s2 == nil {
-		return nil
-	}
-	var res = e.indexMgr.factory.New()
-
-	i := 0
-	j := 0
-
-	for i < s1.GetLength() && j < s2.GetLength() {
-		if s1.At(i) == s2.At(j) {
-			res.InsertSorted(s1.At(i))
-			i++
-			j++
-		} else if s1.At(i) < s2.At(j) {
-			i++
-		} else {
-			j++
-		}
-	}
-
-	return res
+	return s1.Intersection(s2)
 }
 
 func (e *Engine) union(s1, s2 ordered.OrderedStructure[int]) ordered.OrderedStructure[int] {
-	if s1 == nil {
-		return s2
-	}
-	if s2 == nil {
-		return s1
-	}
-
-	var res = e.indexMgr.factory.New()
-
-	for i := range s1.GetLength() {
-		res.InsertSorted(s1.At(i))
-	}
-
-	for i := range s2.GetLength() {
-		res.InsertSorted(s2.At(i))
-	}
-
-	return res
+	return s1.Union(s2)
 }

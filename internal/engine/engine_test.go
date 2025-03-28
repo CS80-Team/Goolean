@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/CS80-Team/Goolean/internal/structures/factory"
 	"github.com/CS80-Team/Goolean/internal/engine/tokenizer"
+	"github.com/CS80-Team/Goolean/internal/structures/factory"
 	"github.com/CS80-Team/Goolean/internal/structures/ordered"
 	"github.com/CS80-Team/Goolean/internal/textprocessing"
 	"github.com/stretchr/testify/assert"

@@ -36,6 +36,10 @@ func (idx *IndexManager) PutSlice(key string, values []int) {
 }
 
 func (idx *IndexManager) Get(key string) ordered.OrderedStructure[int] {
+	if _, ok := idx.index[key]; !ok {
+		logger.Warn("Key %s not found in index", key)
+		return idx.factory.New()
+	}
 	return idx.index[key]
 }
 

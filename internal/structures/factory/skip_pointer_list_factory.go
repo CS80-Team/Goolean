@@ -7,10 +7,10 @@ import (
 
 var _ StructuresFactory[int] = &SkipPointerListFactory[int]{}
 
-type SkipPointerListFactory[Entry constraints.Ordered] struct {
+type SkipPointerListFactory[Entry constraints.Integer] struct {
 }
 
-func NewSkipPointerListFactory[Entry constraints.Ordered]() *SkipPointerListFactory[Entry] {
+func NewSkipPointerListFactory[Entry constraints.Integer]() *SkipPointerListFactory[Entry] {
 	return &SkipPointerListFactory[Entry]{}
 }
 

@@ -7,10 +7,10 @@ import (
 
 var _ StructuresFactory[int] = &OrderedSliceFactory[int]{}
 
-type OrderedSliceFactory[Entry constraints.Ordered] struct {
+type OrderedSliceFactory[Entry constraints.Integer] struct {
 }
 
-func NewOrderedSliceFactory[Entry constraints.Ordered]() *OrderedSliceFactory[Entry] {
+func NewOrderedSliceFactory[Entry constraints.Integer]() *OrderedSliceFactory[Entry] {
 	return &OrderedSliceFactory[Entry]{}
 }
 
