@@ -80,4 +80,26 @@ func TestTokenization(t *testing.T) {
 			assert.Equal(t, len(tc.expected), i, "Expected number of tokens to match")
 		}
 	})
+
+	t.Run("Test Tokenizing empty strings", func(t *testing.T) {
+		testcases := []struct {
+			input    string
+			expected []string
+		}{
+			{
+				input:    "                     ",
+				expected: []string{},
+			},
+			{
+				input:    "   ,,,,,,,,,,    ",
+				expected: []string{},
+			},
+		}
+
+		for _, tc := range testcases {
+			tokenizer := NewTokenizer(&tc.input, NewDelimiterManager(&tokens))
+
+			assert.Equal(t, false, tokenizer.HasNext(), "Expected no tokens to be found")
+		}
+	})
 }

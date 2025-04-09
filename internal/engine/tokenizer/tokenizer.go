@@ -7,7 +7,16 @@ type Tokenizer struct {
 }
 
 func NewTokenizer(line *string, delimiterManager *DelimiterManager) *Tokenizer {
-	return &Tokenizer{line: line, idx: 0, delimiterManager: delimiterManager}
+	tokenizer := Tokenizer{line: line, idx: 0, delimiterManager: delimiterManager}
+	tokenizer.adjustIdxPointer()
+
+	return &tokenizer
+}
+
+func (t *Tokenizer) adjustIdxPointer() {
+	for t.idx < len(*t.line) && t.delimiterManager.IsDelimiter((*t.line)[t.idx]) {
+		t.idx++
+	}
 }
 
 func (t *Tokenizer) NextToken() string {
@@ -16,18 +25,14 @@ func (t *Tokenizer) NextToken() string {
 	}
 
 	var token string
-	for t.idx < len(*t.line) && t.delimiterManager.IsDelimiter((*t.line)[t.idx]) {
-		t.idx++
-	}
+	t.adjustIdxPointer()
 
 	for t.idx < len(*t.line) && !t.delimiterManager.IsDelimiter((*t.line)[t.idx]) {
 		token += string(rune((*t.line)[t.idx]))
 		t.idx++
 	}
 
-	for t.idx < len(*t.line) && t.delimiterManager.IsDelimiter((*t.line)[t.idx]) {
-		t.idx++
-	}
+	t.adjustIdxPointer()
 
 	return token
 }
