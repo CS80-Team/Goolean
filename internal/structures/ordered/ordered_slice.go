@@ -32,11 +32,11 @@ func NewOrderedSliceWithSlice[Entry constraints.Integer](slice []Entry) OrderedS
 	return &OrderedSlice[Entry]{data: newSlice}
 }
 
-func (o *OrderedSlice[Entry]) InsertSorted(entry Entry) {
+func (o *OrderedSlice[Entry]) InsertSorted(entry Entry) bool {
 	var idx = o.UpperBound(entry)
 
 	if idx-1 >= 0 && o.data[idx-1] == entry { // neglect duplicates
-		return
+		return false
 	}
 
 	o.data = append(o.data, entry)
@@ -45,6 +45,8 @@ func (o *OrderedSlice[Entry]) InsertSorted(entry Entry) {
 	for i := idx + 1; i < len(o.data); i++ {
 		o.data[i], swp = swp, o.data[i]
 	}
+
+    return true;
 }
 
 func (o *OrderedSlice[Entry]) BinarySearch(entry Entry) int {
@@ -193,4 +195,18 @@ func (s1 *OrderedSlice[Entry]) Union(s2 OrderedStructure[Entry]) OrderedStructur
     }
 
 	return res
+}
+
+func (s *OrderedSlice[Entry]) Remove(entry Entry) bool {
+    if s == nil || s.IsEmpty() {
+        return false
+    }
+
+    var idx = s.BinarySearch(entry)
+    if idx == -1 {
+        return false
+    }
+
+    s.data = append(s.data[:idx], s.data[idx+1:]...)
+    return true
 }

@@ -84,23 +84,21 @@ func (s *SkipPointerList[Entry]) UpdateSkipPointers() {
 	}
 }
 
-func (s *SkipPointerList[Entry]) InsertSorted(entry Entry) {
+func (s *SkipPointerList[Entry]) InsertSorted(entry Entry) bool {
 	newNode := &SkipNode[Entry]{entry: entry}
 	if s.head == nil {
 		s.head = newNode
 		s.tail = newNode
 		s.size++
-		return
+		return true
 	}
 
 	if s.head.entry > entry {
-		s.pushFront(entry)
-		return
+		return s.pushFront(entry)
 	}
 
 	if s.tail.entry < entry {
-		s.pushBack(entry)
-		return
+		return s.pushBack(entry)
 	}
 
 	curr := s.head
@@ -114,7 +112,7 @@ func (s *SkipPointerList[Entry]) InsertSorted(entry Entry) {
 
 	// neglect duplicates
 	if curr.next != nil && curr.next.entry == entry {
-		return
+		return false
 	}
 
 	newNode.next = curr.next
@@ -129,6 +127,8 @@ func (s *SkipPointerList[Entry]) InsertSorted(entry Entry) {
 	if s.size >= (s.currBlockSize+1)*(s.currBlockSize+1) {
 		s.UpdateSkipPointers()
 	}
+
+	return true
 }
 
 func (s *SkipPointerList[Entry]) GetLength() int {
@@ -141,10 +141,9 @@ func (s *SkipPointerList[Entry]) IsEmpty() bool {
 
 // Used internally for `SetOperations` functions,
 // where it is guaranteed that the insertion is always sorted and added to the end
-func (s *SkipPointerList[Entry]) pushBack(entry Entry) {
+func (s *SkipPointerList[Entry]) pushBack(entry Entry) bool {
 	if s.IsEmpty() {
-		s.InsertSorted(entry)
-		return
+		return s.InsertSorted(entry)
 	}
 
 	if s.tail.entry > entry {
@@ -152,18 +151,19 @@ func (s *SkipPointerList[Entry]) pushBack(entry Entry) {
 	}
 
 	if s.tail.entry == entry {
-		return
+		return false
 	}
 
 	s.tail.next = &SkipNode[Entry]{entry: entry}
 	s.tail = s.tail.next
 	s.size++
+
+	return true
 }
 
-func (s *SkipPointerList[Entry]) pushFront(entry Entry) {
+func (s *SkipPointerList[Entry]) pushFront(entry Entry) bool {
 	if s.IsEmpty() {
-		s.InsertSorted(entry)
-		return
+		return s.InsertSorted(entry)
 	}
 
 	if s.head.entry < entry {
@@ -171,12 +171,14 @@ func (s *SkipPointerList[Entry]) pushFront(entry Entry) {
 	}
 
 	if s.head.entry == entry {
-		return
+		return false
 	}
 
 	newNode := &SkipNode[Entry]{entry: entry, next: s.head}
 	s.head = newNode
 	s.size++
+
+	return true
 }
 
 func (s *SkipPointerList[Entry]) At(index int) Entry {
@@ -284,4 +286,38 @@ func (s1 *SkipPointerList[Entry]) Union(s2 OrderedStructure[Entry]) OrderedStruc
 	}
 
 	return res
+}
+
+func (s *SkipPointerList[Entry]) Remove(entry Entry) bool {
+    if s.IsEmpty() {
+        return false
+    }
+
+    if s.head.entry == entry {
+        s.head = s.head.next
+        s.size--
+        return true
+    }
+
+    curr := s.head
+    for curr.next != nil && curr.next.entry < entry {
+        if curr.skip != nil && curr.skip.entry < entry {
+            curr = curr.skip
+        } else {
+            curr = curr.next
+        }
+    }
+
+    if curr.next == nil || curr.next.entry != entry {
+        return false
+    }
+
+    curr.next = curr.next.next
+    s.size--
+
+    if curr.next == nil {
+        s.tail = curr
+    }
+
+    return true
 }
