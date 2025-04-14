@@ -11,7 +11,8 @@ type SetOperations[Entry constraints.Ordered] interface {
 type OrderedStructure[Entry constraints.Ordered] interface {
 	SetOperations[Entry]
 
-	InsertSorted(Entry)
+	InsertSorted(Entry) bool
+    Remove(Entry) bool
 
 	GetLength() int
 	IsEmpty() bool

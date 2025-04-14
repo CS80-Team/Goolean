@@ -37,6 +37,20 @@ func (idx *IndexManager) PutSlice(key string, values []int) {
 	}
 }
 
+func (idx *IndexManager) Remove(docID int) {
+	logger.Info(IndexManagerPrefix, fmt.Sprintf("Removing document ID %d from index, A LINEAR SEARCH is performed.", docID))
+
+	numRemove := 0
+
+	for key := range idx.index {
+		if idx.index[key].Remove(docID) {
+			numRemove++
+		}
+	}
+
+    logger.Info(IndexManagerPrefix, fmt.Sprintf("Removed document ID %d, %d Keys are affected.", docID, numRemove))
+}
+
 func (idx *IndexManager) Get(key string) ordered.OrderedStructure[int] {
 	if _, ok := idx.index[key]; !ok {
 		logger.Warn(IndexManagerPrefix, fmt.Sprintf("Key %s not found in index", key))

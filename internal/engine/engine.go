@@ -20,7 +20,7 @@ type Engine struct {
 	indexMgr IndexManager
 
 	// `library` is a "set" that stores documents names to avoid adding the same document multiple times.
-	library map[string]struct{}
+	library map[string]int
 
 	// `processor` is used to process the tokens before adding them to the index and before querying the index,
 	// it removes stop words and apply stemming and normalization to the tokens.
@@ -34,19 +34,26 @@ func NewEngine(processor textprocessing.Processor, delimiterManager *tokenizer.D
 	return &Engine{
 		docs:             make([]*internal.Document, 0),
 		indexMgr:         idxMgr,
-		library:          make(map[string]struct{}),
+		library:          make(map[string]int),
 		processor:        processor,
 		delimiterManager: delimiterManager,
 	}
 }
 
 func (e *Engine) AddDocument(doc *internal.Document) {
-	if _, ok := e.library[doc.Name]; !ok {
-		doc.ID = e.GetNextDocID()
+	if _, ok := e.library[doc.GetFilePath()]; !ok {
+		logger.Info(EnginePrefix, "Adding document %s", doc.GetFilePath())
+
+        doc.ID = e.GetNextDocID()
 		e.docs = append(e.docs, doc)
-		e.library[doc.DirectoryPath] = struct{}{}
-		e.parseDocument(doc)
+		e.library[doc.GetFilePath()] = doc.ID
+	} else { // document already exists, update the document by removing it from the index and re-adding it
+		logger.Warn(EnginePrefix, "Updating document %s", doc.GetFilePath())
+
+        doc.ID = e.library[doc.GetFilePath()]
+        e.indexMgr.Remove(doc.ID)
 	}
+    e.parseDocument(doc)
 }
 
 func (e *Engine) ProcessToken(token string) string {
